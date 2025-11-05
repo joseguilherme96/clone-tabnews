@@ -23,8 +23,7 @@ async function status(request, response) {
     "updated_at": updatedAt , 
     "dependencies":{
       "database":{
-        "version_database":databaseVersionValue,
-        "opened_connections":1,
+        "version":databaseVersionValue,
         "max_connections": parseInt(databaseMaxConnectionsValue),
         "opened_connetions": databaseOpenedConnectionValue
       }
