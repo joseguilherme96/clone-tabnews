@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm run services:up && next dev",
-    "services:up":"docker compose -f infra/compose.yaml up -d",
-    "services:stop":"docker compose -f infra/compose.yaml stop",
-    "services:down":"docker compose -f infra/compose.yaml down",
+    "services:up": "docker compose -f infra/compose.yaml up -d",
+    "services:stop": "docker compose -f infra/compose.yaml stop",
+    "services:down": "docker compose -f infra/compose.yaml down",
     "lint:check": "prettier --check .",
     "lint:fix": "prettier --write .",
-    "test": "jest",
-    "test:watch": "jest --watchAll",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watchAll --runInBand",
     "migration:create": "node-pg-migrate --migrations-dir infra/migrations create",
     "migration:up": "node-pg-migrate --migrations-dir infra/migrations --envPath .env.development up"
   },
