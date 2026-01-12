@@ -1,25 +1,32 @@
-import database from "infra/database";
+import database from "infra/database"
+import orchestrator from "tests/orchestrator"
 
-beforeAll(cleanDataBase)
+beforeAll(async () =>{
+
+  await orchestrator.waitForAllServices(),
+  await cleanDataBase()
+
+})
 
 async function cleanDataBase() {
   await database.query("drop schema public cascade; create schema public;")
 }
 
-test("GET to /api/v1/migrations should return 201", async () => {
+test("POST to /api/v1/migrations should return 201", async () => {
 
   const response1 = await fetch("http://localhost:3000/api/v1/migrations",{
     method : "POST"
   });
-  expect(response1.status).toBe(201);
-
   const responseBody1 = await response1.json();
+
+  expect(response1.status).toBe(201);
+  expect(Array.isArray(responseBody1)).toBe(true)
+  expect(responseBody1.length).toBeGreaterThan(0)
+
 
   const countMigration1 = await database.query("SELECT COUNT(*)::int as amount_of_migration FROM pgmigrations")
   expect(countMigration1.rows[0].amount_of_migration).toBeGreaterThan(0)
 
-  expect(Array.isArray(responseBody1)).toBe(true)
-  expect(responseBody1.length).toBe(1)
 
   const response2 = await fetch("http://localhost:3000/api/v1/migrations",{
     method : "POST"

@@ -34,8 +34,6 @@ export default async function migrations(request, response){
       "dryRun": true,
       })
 
-      await dbClient.end()
-
       response.status(200).json(migratedMigrations)
 
     }
