@@ -8,11 +8,11 @@ export default defineConfig([
     files: ["**/*.{js,mjs,cjs,jsx}"],
     plugins: { js },
     extends: ["js/recommended"],
-    languageOptions: { 
+    languageOptions: {
       globals: {
         ...globals.browser,
-        ...globals.node
-      } 
+        ...globals.node,
+      },
     },
   },
   {
@@ -35,5 +35,4 @@ export default defineConfig([
       },
     },
   },
-  
 ]);
