@@ -16,8 +16,14 @@
     "migration:create": "node-pg-migrate --migrations-dir infra/migrations create",
     "migration:up": "node-pg-migrate --migrations-dir infra/migrations --envPath .env.development up",
     "wait-for-postgres": "node infra/scripts/wait-for-postgres.js",
-    "prepare": "husky",
-    "commit": "cz"
+    "commit": "cz",
+    "git:secrets:clone": "test -d git-secrets || git clone https://github.com/awslabs/git-secrets.git",
+    "git:secrets:install": "cd git-secrets && if [ \"$CI_SUDO_REQUIRED\" = \"true\" ]; then sudo make install; else make install; fi",
+    "git:secrets:add:file": "git config --get-all secrets.providers | grep -q \"cat .secrets.ini\" || git-secrets --add-provider -- cat .secrets.ini",
+    "git:secrets:add:aws": "git secrets --register-aws",
+    "git:secrets:add": "npm run git:secrets:add:aws && npm run git:secrets:add:file",
+    "git:secrets:up": " npm run git:secrets:clone &&  npm run git:secrets:install && npm run git:secrets:add",
+    "prepare": "husky && npm run git:secrets:up"
   },
   "author": "",
   "license": "MIT",

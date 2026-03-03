@@ -5,6 +5,8 @@ on: pull_request
 jobs:
   prettier:
     name: Prettier
+    env:
+      CI_SUDO_REQUIRED: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +19,8 @@ jobs:
       - run: npm run lint:prettier:check
   eslint:
     name: Eslint
+    env:
+      CI_SUDO_REQUIRED: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +34,8 @@ jobs:
 
   commitlint:
     name: commitlint
+    env:
+      CI_SUDO_REQUIRED: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
