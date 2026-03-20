@@ -2,7 +2,7 @@ import database from "infra/database";
 import orchestrator from "tests/orchestrator";
 
 beforeAll(async () => {
-  (await orchestrator.waitForAllServices(), await cleanDataBase());
+  await orchestrator.waitForAllServices(), await cleanDataBase();
 });
 
 async function cleanDataBase() {
