@@ -1,8 +1,9 @@
 import StatusDataBaseMarginLeft from "./share/StatusDatabase";
 import getText from "../../../pages/status/utils/getText";
+import useSWRFecthAPIStatus from "pages/status/services/useSWRFecthAPIStatus";
 
-function OpenedConnetions(api_status) {
-  const [isLoading, data] = api_status.response;
+function OpenedConnetions() {
+  const [isLoading, data] = useSWRFecthAPIStatus();
 
   let value = !isLoading ? data.dependencies.database.opened_connetions : false;
   let text = getText(isLoading, value);

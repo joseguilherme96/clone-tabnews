@@ -1,8 +1,9 @@
 import StatusDataBaseMarginLeft from "./share/StatusDatabase";
 import getText from "../../../pages/status/utils/getText";
+import useSWRFecthAPIStatus from "pages/status/services/useSWRFecthAPIStatus";
 
-function MaxConnections(api_status) {
-  const [isLoading, data] = api_status.response;
+function MaxConnections() {
+  const [isLoading, data] = useSWRFecthAPIStatus();
 
   let value = !isLoading ? data.dependencies.database.max_connections : false;
   let text = getText(isLoading, value);
