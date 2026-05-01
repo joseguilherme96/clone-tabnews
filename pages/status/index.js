@@ -1,6 +1,6 @@
-import ColorTextDefault from "./components/Color/ColorTextDefault";
-import UpdatedAt from "./components/Status/UpdatedAt";
-import DataBase from "./components/Status/DataBase/DataBase";
+import ColorTextDefault from "../../components/Color/ColorTextDefault";
+import UpdatedAt from "../../components/Status/UpdatedAt";
+import DataBase from "../../components/Status/DataBase/DataBase";
 import useSWRFecthAPIStatus from "./services/useSWRFecthAPIStatus";
 
 export default function StatusPage() {

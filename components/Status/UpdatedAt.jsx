@@ -1,5 +1,5 @@
 import Status from "./share/Status";
-import getText from "../../utils/getText";
+import getText from "../../pages/status/utils/getText";
 
 function UpdatedAt(api_status) {
   const [isLoading, data] = api_status.response;

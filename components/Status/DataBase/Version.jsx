@@ -1,5 +1,5 @@
 import StatusDataBaseMarginLeft from "./share/StatusDatabase";
-import getText from "../../../utils/getText";
+import getText from "../../../pages/status/utils/getText";
 
 function Version(api_status) {
   const [isLoading, data] = api_status.response;
