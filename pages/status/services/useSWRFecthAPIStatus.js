@@ -12,7 +12,7 @@ function useSWRFecthAPIStatus() {
     refreshInterval: 2000,
   });
 
-  return { isLoading, data };
+  return [isLoading, data];
 }
 
 export default useSWRFecthAPIStatus;

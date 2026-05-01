@@ -4,7 +4,7 @@ import DataBase from "../../components/Status/DataBase/DataBase";
 import useSWRFecthAPIStatus from "./services/useSWRFecthAPIStatus";
 
 export default function StatusPage() {
-  const { isLoading, data } = useSWRFecthAPIStatus();
+  const [isLoading, data] = useSWRFecthAPIStatus();
   return (
     <>
       <h1>
