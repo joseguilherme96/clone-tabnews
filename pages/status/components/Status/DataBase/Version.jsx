@@ -1,9 +1,8 @@
 import StatusDataBaseMarginLeft from "./share/StatusDatabase";
-import useSWRFecthAPIStatus from "../../../services/useSWRFecthAPIStatus";
 import getText from "../../../utils/getText";
 
-function Version() {
-  const { isLoading, data } = useSWRFecthAPIStatus();
+function Version(api_status) {
+  const [isLoading, data] = api_status.response;
 
   let value = !isLoading ? data.dependencies.database.version : false;
   let text = getText(isLoading, value);

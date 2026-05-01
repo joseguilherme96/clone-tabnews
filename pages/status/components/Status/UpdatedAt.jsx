@@ -1,9 +1,8 @@
-import useSWRFecthAPIStatus from "../../services/useSWRFecthAPIStatus";
 import Status from "./share/Status";
 import getText from "../../utils/getText";
 
-function UpdatedAt() {
-  const { isLoading, data } = useSWRFecthAPIStatus();
+function UpdatedAt(api_status) {
+  const [isLoading, data] = api_status.response;
 
   let value = !isLoading
     ? new Date(data.updated_at).toLocaleString("pt-BR")
