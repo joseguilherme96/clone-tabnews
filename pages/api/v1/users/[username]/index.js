@@ -4,17 +4,14 @@ import controller from "infra/controler";
 
 const router = createRouter();
 
-router.post(postHandler);
+router.get(getHandler);
 
 export default router.handler({
   onError: controller.errorHandlers.onErrorHandler,
 });
 
-async function postHandler(request, response) {
-  const inputCreateUser = request.body;
-
-  console.log(inputCreateUser);
-  const newUser = await user.create(inputCreateUser);
-
-  await response.status(201).json(newUser);
+async function getHandler(request, response) {
+  const username = request.query.username;
+  const findOneUserByUsername = await user.findOneByUsername(username);
+  await response.status(200).json(findOneUserByUsername);
 }
