@@ -1,5 +1,7 @@
 import orchestrator from "tests/orchestrator";
 import { version as uuidVersion } from "uuid";
+import user from "model/user";
+import password from "model/password";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices(), await orchestrator.cleanDataBase();
@@ -36,13 +38,26 @@ describe("GET /api/v1/users", () => {
         id: responseBody.id,
         username: "username",
         email: "username@outlook.com.br",
-        password: "sss",
+        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
+
+      const userInDataBase = await user.findOneByUsername("username");
+      const correctPasswordMatch = await password.compare(
+        "sss",
+        userInDataBase.password,
+      );
+      const incorrectPasswordMatch = await password.compare(
+        "SenhaErrada",
+        userInDataBase.password,
+      );
+
+      expect(correctPasswordMatch).toBe(true);
+      expect(incorrectPasswordMatch).toBe(false);
     });
 
     test("With case mismatch", async () => {
@@ -73,7 +88,7 @@ describe("GET /api/v1/users", () => {
         id: responseBody.id,
         username: "Username1",
         email: "username1@outlook.com.br",
-        password: "sss",
+        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
