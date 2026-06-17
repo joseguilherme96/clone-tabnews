@@ -54,19 +54,9 @@ describe("POST /api/v1/users", () => {
     });
 
     test("With duplicated 'email'", async () => {
-      const firstResponse = await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: "jose.guilherme96",
-          email: "duplicate@outlook.com.br",
-          password: "sss",
-        }),
+      await orchestrator.createUser({
+        email: "duplicate@outlook.com.br",
       });
-
-      expect(firstResponse.status).toBe(201);
 
       const secondResponse = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
@@ -92,19 +82,9 @@ describe("POST /api/v1/users", () => {
     });
 
     test("With duplicated 'username'", async () => {
-      const firstResponse = await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: "usernameduplicate",
-          email: "usernameduplicate1@outlook.com.br",
-          password: "sss",
-        }),
+      await orchestrator.createUser({
+        username: "usernameduplicate",
       });
-
-      expect(firstResponse.status).toBe(201);
 
       const secondResponse = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
