@@ -11,22 +11,9 @@ beforeAll(async () => {
 describe("GET /api/v1/users", () => {
   describe("Anonymous user", () => {
     test("With exact case match", async () => {
-      const response_create_user = await fetch(
-        "http://localhost:3000/api/v1/users",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: "username",
-            email: "username@outlook.com.br",
-            password: "sss",
-          }),
-        },
-      );
-
-      expect(response_create_user.status).toBe(201);
+      const createdUser = await orchestrator.createUser({
+        username: "username",
+      });
 
       const responseFindUserByUsername = await fetch(
         "http://localhost:3000/api/v1/users/username",
@@ -37,7 +24,7 @@ describe("GET /api/v1/users", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "username",
-        email: "username@outlook.com.br",
+        email: createdUser.email,
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -61,22 +48,9 @@ describe("GET /api/v1/users", () => {
     });
 
     test("With case mismatch", async () => {
-      const response_create_user = await fetch(
-        "http://localhost:3000/api/v1/users",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: "Username1",
-            email: "username1@outlook.com.br",
-            password: "sss",
-          }),
-        },
-      );
-
-      expect(response_create_user.status).toBe(201);
+      const createdUser = await orchestrator.createUser({
+        username: "Username1",
+      });
 
       const responseFindUserByUsername = await fetch(
         `http://localhost:3000/api/v1/users/USERNAME1`,
@@ -87,7 +61,7 @@ describe("GET /api/v1/users", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "Username1",
-        email: "username1@outlook.com.br",
+        email: createdUser.email,
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
