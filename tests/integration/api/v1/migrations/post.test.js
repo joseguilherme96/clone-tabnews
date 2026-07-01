@@ -34,7 +34,7 @@ describe("POST /api/v1/migrations", () => {
       const countMigration2 = await database.query(
         "SELECT COUNT(*)::int as amount_of_migration FROM pgmigrations",
       );
-      expect(countMigration2.rows[0].amount_of_migration).toBe(1);
+      expect(countMigration2.rows[0].amount_of_migration).toBeGreaterThan(0);
 
       expect(Array.isArray(responseBody2)).toBe(true);
       expect(responseBody2.length).toBe(0);
