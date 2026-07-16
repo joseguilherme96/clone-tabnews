@@ -6,6 +6,9 @@ import {
   UnauthorizedError,
 } from "infra/errors.js";
 
+import session from "model/session";
+import * as cookie from "cookie";
+
 function onNoMatcherHandler(request, response) {
   const publicErrorObject = new MethodNotAllowedError();
   response.status(405).json(publicErrorObject);
@@ -33,11 +36,24 @@ function onErrorHandler(error, request, response) {
   console.error(publicErrorObject);
 }
 
+function setSessionCookie(response,sessionToken){
+
+  const setCookie = cookie.serialize("session_id", sessionToken, {
+    path: "/",
+    maxAge: session.EXPIRE_IN_MILISECONDS / 1000,
+    secure: process.env.NODE_ENV == "production",
+    httpOnly: true,
+  });
+  response.setHeader("Set-Cookie", setCookie);
+
+}
+
 const controller = {
   errorHandlers: {
     onNoMatcherHandler: onNoMatcherHandler,
-    onErrorHandler: onErrorHandler,
+    onErrorHandler: onErrorHandler
   },
+  setSessionCookie : setSessionCookie,
 };
 
 export default controller;

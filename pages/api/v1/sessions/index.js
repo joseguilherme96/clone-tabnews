@@ -15,14 +15,7 @@ async function postHandler(request, response) {
   );
   const newSession = await session.create(authenticatedUser.id);
 
-  const setCookie = cookie.serialize("session_id", newSession.token, {
-    path: "/",
-    maxAge: session.EXPIRE_IN_MILISECONDS / 1000,
-    secure: process.env.NODE_ENV == "production",
-    httpOnly: true,
-  });
-  response.setHeader("Set-Cookie", setCookie);
-
+  controller.setSessionCookie(response,newSession.token);
   await response.status(201).json(newSession);
 }
 
