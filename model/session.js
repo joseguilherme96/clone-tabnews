@@ -30,7 +30,6 @@ async function create(userId) {
 }
 
 async function findOneValidByToken(sessionToken) {
-
   const now = new Date(Date.now());
 
   const results = await database.query({
@@ -66,7 +65,6 @@ async function findOneValidByToken(sessionToken) {
       action: "Verifique se o usuário está logado e tente novamente.",
     });
   }
-
 
   return results.rows[0];
 }

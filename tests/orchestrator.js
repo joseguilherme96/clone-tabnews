@@ -42,9 +42,7 @@ async function createUser(userObject) {
 }
 
 async function createSession(user_id) {
-
   return await session.create(user_id);
-  
 }
 
 const orchestrator = {

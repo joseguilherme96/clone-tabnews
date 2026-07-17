@@ -36,8 +36,7 @@ function onErrorHandler(error, request, response) {
   console.error(publicErrorObject);
 }
 
-function setSessionCookie(response,sessionToken){
-
+function setSessionCookie(response, sessionToken) {
   const setCookie = cookie.serialize("session_id", sessionToken, {
     path: "/",
     maxAge: session.EXPIRE_IN_MILISECONDS / 1000,
@@ -45,15 +44,14 @@ function setSessionCookie(response,sessionToken){
     httpOnly: true,
   });
   response.setHeader("Set-Cookie", setCookie);
-
 }
 
 const controller = {
   errorHandlers: {
     onNoMatcherHandler: onNoMatcherHandler,
-    onErrorHandler: onErrorHandler
+    onErrorHandler: onErrorHandler,
   },
-  setSessionCookie : setSessionCookie,
+  setSessionCookie: setSessionCookie,
 };
 
 export default controller;
