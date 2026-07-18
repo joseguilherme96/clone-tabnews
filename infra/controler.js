@@ -46,12 +46,20 @@ function setSessionCookie(response, sessionToken) {
   response.setHeader("Set-Cookie", setCookie);
 }
 
+function setCacheControl(response) {
+  response.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, max-age=0, must-revalidate",
+  );
+}
+
 const controller = {
   errorHandlers: {
     onNoMatcherHandler: onNoMatcherHandler,
     onErrorHandler: onErrorHandler,
   },
   setSessionCookie: setSessionCookie,
+  setCacheControl: setCacheControl,
 };
 
 export default controller;

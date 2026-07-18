@@ -15,7 +15,9 @@ async function postHandler(request, response) {
   const newSession = await session.create(authenticatedUser.id);
 
   controller.setSessionCookie(response, newSession.token);
-  await response.status(201).json(newSession);
+  controller.setCacheControl(response);
+
+  response.status(201).json(newSession);
 }
 
 export default router.handler({
