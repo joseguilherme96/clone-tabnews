@@ -111,6 +111,11 @@ describe("POST /api/v1/sessions", () => {
       });
       expect(response.status).toBe(201);
 
+      const cacheControl = response.headers.get("Cache-Control");
+      expect(cacheControl).toBe(
+        "no-store, no-cache, max-age=0, must-revalidate",
+      );
+
       const responseBody = await response.json();
 
       expect(responseBody).toEqual({
