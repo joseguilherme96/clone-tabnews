@@ -108,6 +108,17 @@ describe("GET /api/v1/user", () => {
         action: "Verifique se o usuário está logado e tente novamente.",
         status_code: 401,
       });
+
+      const parsedSetCookie = SetCookieParser.parse(response, {
+        map: true,
+      });
+      expect(parsedSetCookie.session_id).toEqual({
+        name: "session_id",
+        value: "invalid",
+        maxAge: -1,
+        path: "/",
+        httpOnly: true,
+      });
     });
 
     test("With a valid session expiring in 1 day.", async () => {
@@ -177,6 +188,17 @@ describe("GET /api/v1/user", () => {
       });
 
       expect(response.status).toBe(401);
+
+      const parsedSetCookie = SetCookieParser.parse(response, {
+        map: true,
+      });
+      expect(parsedSetCookie.session_id).toEqual({
+        name: "session_id",
+        value: "invalid",
+        maxAge: -1,
+        path: "/",
+        httpOnly: true,
+      });
     });
   });
 });
