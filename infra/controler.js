@@ -46,6 +46,16 @@ function setSessionCookie(response, sessionToken) {
   response.setHeader("Set-Cookie", setCookie);
 }
 
+function clearSessionCookie(response) {
+  const setCookie = cookie.serialize("session_id", "invalid", {
+    path: "/",
+    maxAge: -1,
+    secure: process.env.NODE_ENV == "production",
+    httpOnly: true,
+  });
+  response.setHeader("Set-Cookie", setCookie);
+}
+
 function setCacheControl(response) {
   response.setHeader(
     "Cache-Control",
@@ -60,6 +70,7 @@ const controller = {
   },
   setSessionCookie: setSessionCookie,
   setCacheControl: setCacheControl,
+  clearSessionCookie: clearSessionCookie,
 };
 
 export default controller;
