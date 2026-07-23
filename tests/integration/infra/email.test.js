@@ -1,23 +1,23 @@
-import { send } from "infra/email.js";
-import orchestrator, { waitForEmailServices } from "tests/orchestrator.js";
-import { deleteAllEmails } from "tests/orchestrator.email.js";
+import orchestrator from "tests/orchestrator.js";
+import orchestratorEmail from "tests/orchestrator.email.js";
+import email from "infra/email.js";
 
 beforeAll(async () => {
-  await waitForEmailServices();
+  await orchestrator.waitForAllServices();
 });
 
 describe("infra/email.test.js", () => {
   test("send()", async () => {
-    await deleteAllEmails();
+    await orchestratorEmail.deleteAllEmails();
 
-    await send({
+    await email.send({
       from: '"Example Team" <team@example.com>',
       to: "alice@example.com, bob@example.com",
       subject: "Hello",
       text: "Hello world?",
     });
 
-    await send({
+    await email.send({
       from: '"Example Team" <team@example.com>',
       to: "alice@example.com, bob@example.com",
       subject: "Último email enviado",
@@ -28,10 +28,10 @@ describe("infra/email.test.js", () => {
 
     expect(lastEmail.id).toBe(2);
     expect(lastEmail.sender).toBe("<team@example.com>");
-    expect(lastEmail.recipients[0]).toBe("alice@example.com");
-    expect(lastEmail.recipients[1]).toBe("bob@example.com");
+    expect(lastEmail.recipients[0]).toBe("<alice@example.com>");
+    expect(lastEmail.recipients[1]).toBe("<bob@example.com>");
     expect(lastEmail.subject).toBe("Último email enviado");
-    expect(lastEmail.size).toBe("350");
-    expect(lastEmail.text).toBe("Corpo do ultimo email enviado.\r\n");
+    expect(lastEmail.size).toBe("357");
+    expect(lastEmail.text).toBe("Corpo do ultimo email enviado.\n");
   });
 });

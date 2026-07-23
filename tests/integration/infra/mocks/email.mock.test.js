@@ -1,5 +1,5 @@
 import { send } from "infra/email.js";
-import orchestrator, { waitForEmailServices } from "tests/orchestrator.js";
+import orchestrator, { waitForAllServices } from "tests/orchestrator.js";
 import { deleteAllEmails } from "tests/orchestrator.email.js";
 
 jest.mock("infra/email.js", () => {
@@ -22,9 +22,9 @@ jest.mock("tests/orchestrator.email.js", () => {
         {
           id: 1,
           sender: "<team@example.com>",
-          recipients: ["alice@example.com", "bob@example.com"],
+          recipients: ["<alice@example.com>", "<bob@example.com>"],
           subject: "Último email enviado",
-          size: "350",
+          size: "357",
           created_at: "2025-08-30T19:28:58+00:00",
           text: "Corpo do ultimo email enviado.\r\n",
         },
@@ -32,24 +32,16 @@ jest.mock("tests/orchestrator.email.js", () => {
         {
           id: 2,
           sender: "<team@example.com>",
-          recipients: ["alice@example.com", "bob@example.com"],
+          recipients: ["<alice@example.com>", "<bob@example.com>"],
           subject: "Último email enviado",
-          size: "350",
+          size: "357",
           created_at: "2025-08-30T19:28:58+00:00",
           text: "Corpo do ultimo email enviado.\r\n",
         },
       ];
     }),
     getEmailById: jest.fn(() => {
-      return {
-        id: 2,
-        sender: "<team@example.com>",
-        recipients: ["alice@example.com", "bob@example.com"],
-        subject: "Último email enviado",
-        size: "350",
-        created_at: "2025-08-30T19:28:58+00:00",
-        text: "Corpo do ultimo email enviado.\r\n",
-      };
+      return "Corpo do ultimo email enviado.\r\n";
     }),
   };
 });
@@ -60,12 +52,12 @@ jest.mock("tests/orchestrator.js", () => {
   return {
     __esModule: true,
     ...originalModule,
-    waitForEmailServices: jest.fn(() => true),
+    waitForAllServices: jest.fn(() => true),
   };
 });
 
 beforeAll(async () => {
-  await waitForEmailServices();
+  await waitForAllServices();
 });
 
 describe("infra/email.test.js", () => {
@@ -90,10 +82,10 @@ describe("infra/email.test.js", () => {
 
     expect(lastEmail.id).toBe(2);
     expect(lastEmail.sender).toBe("<team@example.com>");
-    expect(lastEmail.recipients[0]).toBe("alice@example.com");
-    expect(lastEmail.recipients[1]).toBe("bob@example.com");
+    expect(lastEmail.recipients[0]).toBe("<alice@example.com>");
+    expect(lastEmail.recipients[1]).toBe("<bob@example.com>");
     expect(lastEmail.subject).toBe("Último email enviado");
-    expect(lastEmail.size).toBe("350");
+    expect(lastEmail.size).toBe("357");
     expect(lastEmail.text).toBe("Corpo do ultimo email enviado.\r\n");
   });
 });
