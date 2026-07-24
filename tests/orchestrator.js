@@ -4,9 +4,14 @@ import migrator from "model/migrator.js";
 import user from "model/user";
 import { faker } from "@faker-js/faker";
 import session from "model/session";
+import orchestratorEmail, {
+  getEmails,
+  getEmailById,
+} from "tests/orchestrator.email.js";
 
 async function waitForAllServices() {
   await waitForWebServer();
+  await waitForEmailServer();
 
   async function waitForWebServer() {
     return retry(fetchStatusPage, {
@@ -16,6 +21,21 @@ async function waitForAllServices() {
 
     async function fetchStatusPage() {
       const response = await fetch("http://localhost:3000/api/v1/status");
+
+      if (response.status !== 200) {
+        throw Error();
+      }
+    }
+  }
+
+  async function waitForEmailServer() {
+    return retry(fetchEmailPage, {
+      retries: 100,
+      maxTimeout: 1000,
+    });
+
+    async function fetchEmailPage() {
+      const response = await fetch(orchestratorEmail.emailHttpUrl);
 
       if (response.status !== 200) {
         throw Error();
@@ -45,12 +65,23 @@ async function createSession(user_id) {
   return await session.create(user_id);
 }
 
+async function getLastEmail() {
+  const emails = await getEmails();
+  const lastEmailItem = emails.pop();
+
+  const emailTextBody = await getEmailById(lastEmailItem.id);
+  lastEmailItem.text = emailTextBody;
+
+  return lastEmailItem;
+}
+
 const orchestrator = {
   waitForAllServices: waitForAllServices,
   cleanDataBase: cleanDataBase,
   runPendingMigrations: runPendingMigrations,
   createUser: createUser,
   createSession: createSession,
+  getLastEmail: getLastEmail,
 };
 
 export default orchestrator;
