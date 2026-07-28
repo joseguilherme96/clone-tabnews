@@ -69,6 +69,10 @@ async function getLastEmail() {
   const emails = await getEmails();
   const lastEmailItem = emails.pop();
 
+  if (!lastEmailItem) {
+    return null;
+  }
+
   const emailTextBody = await getEmailById(lastEmailItem.id);
   lastEmailItem.text = emailTextBody;
 
