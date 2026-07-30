@@ -55,7 +55,7 @@ describe("Use case: Resgistration Flow (all sucessful)", () => {
     expect(lastEmail.text).toContain(tokenActivation.id);
 
     expect(lastEmail.text).toContain(
-      `${createUserBodyResponse.username},\r\n\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/${tokenActivation.id}\r\n\nAtenciosamente,\r\nEquipe ModernSystems\r\n`,
+      `${createUserBodyResponse.username},\r\n\r\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/${tokenActivation.id}\r\n\r\nAtenciosamente,\r\nEquipe ModernSystems\r\n`,
     );
   });
 });
