@@ -61,7 +61,7 @@ export async function sendEmailToUser(user, activationToken) {
     from: "ModernSystems <contato@modernsystems.com>",
     to: `${user.email}`,
     subject: "Ative o seu cadastro",
-    text: `${user.email}, 
+    text: `${user.username}, 
 
 Segue link de ativação abaixo:
 ${webserver.origin}/cadastro/ativar/${activationToken.id}
