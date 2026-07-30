@@ -44,18 +44,29 @@ describe("Use case: Resgistration Flow (all sucessful)", () => {
   test("Received activate email", async () => {
     const lastEmail = await orchestrator.getLastEmail();
 
-    const tokenActivation = await activation.findOneByUserId(
-      createUserBodyResponse.id,
+    const findWordIndexActivate = lastEmail.text.search("ativar");
+    const wordIndexToken = findWordIndexActivate + 7;
+    const tokenSize = 36;
+    const extractTokenEmailBody = lastEmail.text.substr(
+      wordIndexToken,
+      tokenSize,
     );
+    const activationTokenObject = await activation.findOneValidByToken(
+      extractTokenEmailBody,
+    );
+
+    expect(extractTokenEmailBody).toBe(activationTokenObject.id);
+    expect(activationTokenObject.user_id).toBe(createUserBodyResponse.id);
+    expect(activationTokenObject.used_at).toBe(null);
 
     expect(lastEmail.sender).toBe("<contato@modernsystems.com>");
     expect(lastEmail.recipients[0]).toBe("<resgistration.flow@teste.com>");
     expect(lastEmail.subject).toBe("Ative o seu cadastro");
     expect(lastEmail.text).toContain(`${createUserBodyResponse.username}`);
-    expect(lastEmail.text).toContain(tokenActivation.id);
+    expect(lastEmail.text).toContain(activationTokenObject.id);
 
     expect(lastEmail.text).toContain(
-      `${createUserBodyResponse.username},\r\n\r\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/${tokenActivation.id}\r\n\r\nAtenciosamente,\r\nEquipe ModernSystems\r\n`,
+      `${createUserBodyResponse.username},\r\n\r\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/${activationTokenObject.id}\r\n\r\nAtenciosamente,\r\nEquipe ModernSystems\r\n`,
     );
   });
 });

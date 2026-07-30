@@ -4,7 +4,7 @@ import {
   getEmailById,
   deleteAllEmails,
 } from "tests/orchestrator.email";
-import activation, { findOneByUserId } from "model/activation.js";
+import activation from "model/activation.js";
 import webserver from "infra/webserver";
 
 const fetch = jest.fn(async () => {
@@ -32,7 +32,7 @@ jest.mock("model/activation.js", () => {
     ...originalModule,
     findOneByUserId: jest.fn(() => {
       return {
-        id: "3c8d-46f9-3624cf8f",
+        id: "3c8d-46f9-3624cf8f-3c8d-46f9-3624cf8",
         user_id: "3624cf8f-3c8d-46f9-8e3c-64b3a0c61e1",
         expires_at: "",
         updated_at: "",
@@ -70,7 +70,7 @@ jest.mock("tests/orchestrator.email.js", () => {
           text: `RegistrationFlow, 
 
 Segue link de ativação abaixo:\r\n
-${webserver.origin}/cadastro/ativar/3c8d-46f9-3624cf8f
+${webserver.origin}/cadastro/ativar/3c8d-46f9-3624cf8f-3c8d-46f9-3624cf8
 
 Atenciosamente,
 Equipe ModernSystems
@@ -80,11 +80,21 @@ Equipe ModernSystems
     }),
     getEmailById: jest.fn(
       () =>
-        `RegistrationFlow,\r\n\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/3c8d-46f9-3624cf8f\r\n\nAtenciosamente,\r\nEquipe ModernSystems\n`,
+        `RegistrationFlow,\r\n\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/3c8d-46f9-3624cf8f-3c8d-46f9-3624cf8\r\n\nAtenciosamente,\r\nEquipe ModernSystems\n`,
     ),
   };
 });
 jest.mock("infra/email.js");
+const findOneValidByToken = jest.fn(() => {
+  return {
+    id: "3c8d-46f9-3624cf8f-3c8d-46f9-3624cf8",
+    used_at: null,
+    user_id: "3624cf8f-3c8d-46f9-8e3c-64b3a0c61e1",
+    expires_at: "2026-07-30T18:22:39.428Z",
+    created_at: "2026-07-30T21:07:39.605Z",
+    updated_at: "2026-07-30T21:07:39.605Z",
+  };
+});
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -125,8 +135,32 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
   });
 
   test("Received activate email", async () => {
+    //Mock
+    const tokenActivation = {
+      id: "3c8d-46f9-3624cf8f-3c8d-46f9-3624cf8",
+      used_at: null,
+      user_id: "3c7055c4-4b8b-418a-9737-80983fbb4e7c",
+      expires_at: "2026-07-30T18:22:39.428Z",
+      created_at: "2026-07-30T21:07:39.605Z",
+      updated_at: "2026-07-30T21:07:39.605Z",
+    };
+
     const lastEmail = await orchestrator.getLastEmail();
-    const tokenActivation = await findOneByUserId(createUserBodyResponse.id);
+
+    const findWordIndexActivate = lastEmail.text.search("ativar");
+    const wordIndexToken = findWordIndexActivate + 7;
+    const tokenSize = 36;
+    const extractTokenEmailBody = lastEmail.text.substr(
+      wordIndexToken,
+      tokenSize,
+    );
+    const activationTokenObject = await findOneValidByToken(
+      extractTokenEmailBody,
+    );
+
+    expect(extractTokenEmailBody).toBe(activationTokenObject.id);
+    expect(activationTokenObject.user_id).toBe(createUserBodyResponse.id);
+    expect(activationTokenObject.used_at).toBe(null);
 
     expect(getEmails.mock.calls[0][0]).toBe(undefined);
     expect(getEmails.mock.results[0].value).toEqual([
@@ -143,29 +177,39 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
 
     expect(getEmailById.mock.calls[0][0]).toBe(2);
     expect(getEmailById.mock.results[0].value).toBe(
-      `${createUserBodyResponse.username},\r\n\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/3c8d-46f9-3624cf8f\r\n\nAtenciosamente,\r\nEquipe ModernSystems\n`,
+      `${createUserBodyResponse.username},\r\n\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/${tokenActivation.id}\r\n\nAtenciosamente,\r\nEquipe ModernSystems\n`,
     );
 
     expect(lastEmail.sender).toBe("<contato@modernsystems.com>");
     expect(lastEmail.recipients[0]).toBe("<resgistration.flow@teste.com>");
     expect(lastEmail.subject).toBe("Ative o seu cadastro");
     expect(lastEmail.text).toContain(`${createUserBodyResponse.username}`);
-    expect(lastEmail.text).toContain(tokenActivation.id);
     expect(lastEmail.text).toContain(
-      `${createUserBodyResponse.username},\r\n\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/3c8d-46f9-3624cf8f\r\n\nAtenciosamente,\r\nEquipe ModernSystems\n`,
+      `${createUserBodyResponse.username},\r\n\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/${tokenActivation.id}\r\n\nAtenciosamente,\r\nEquipe ModernSystems\n`,
     );
   });
 
   test("Create a user account and activate token using functions instead of the http://localhost:3000/api/v1/users endpoint", async () => {
-    const newUser = await orchestrator.createUser({
+    let newUser = await orchestrator.createUser({
       username: "RegistrationFlow",
       email: "resgistration.flow@teste.com",
       password: "ssss383832",
     });
-    const tokenActivation = await activation.create(newUser);
+    let tokenActivation = await activation.create(newUser);
+
     const findToken = await activation.findOneByUserId(newUser.id);
 
     expect(tokenActivation.id).toBe(findToken.id);
+
+    //Mock
+    tokenActivation = {
+      id: "3c8d-46f9-3624cf8f-3c8d-46f9-3624cf8",
+      used_at: null,
+      user_id: "3c7055c4-4b8b-418a-9737-80983fbb4e7c",
+      expires_at: "2026-07-30T18:22:39.428Z",
+      created_at: "2026-07-30T21:07:39.605Z",
+      updated_at: "2026-07-30T21:07:39.605Z",
+    };
 
     await activation.sendEmailToUser(newUser, tokenActivation);
 
@@ -175,7 +219,22 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
     expect(newUser.email).toBe("resgistration.flow@teste.com");
     expect(newUser.password).toBe(newUser.password);
 
-    const email = await orchestrator.getLastEmail();
+    const lastEmail = await orchestrator.getLastEmail();
+
+    const findWordIndexActivate = lastEmail.text.search("ativar");
+    const wordIndexToken = findWordIndexActivate + 7;
+    const tokenSize = 36;
+    const extractTokenEmailBody = lastEmail.text.substr(
+      wordIndexToken,
+      tokenSize,
+    );
+    const activationTokenObject = await findOneValidByToken(
+      extractTokenEmailBody,
+    );
+
+    expect(extractTokenEmailBody).toBe(activationTokenObject.id);
+    expect(activationTokenObject.user_id).toBe(createUserBodyResponse.id);
+    expect(activationTokenObject.used_at).toBe(null);
 
     expect(getEmails.mock.calls[0][0]).toBe(undefined);
     expect(getEmails.mock.results[0].value).toEqual([
@@ -192,15 +251,15 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
 
     expect(getEmailById.mock.calls[0][0]).toBe(2);
     expect(getEmailById.mock.results[0].value).toBe(
-      `RegistrationFlow,\r\n\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/3c8d-46f9-3624cf8f\r\n\nAtenciosamente,\r\nEquipe ModernSystems\n`,
+      `RegistrationFlow,\r\n\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/${tokenActivation.id}\r\n\nAtenciosamente,\r\nEquipe ModernSystems\n`,
     );
 
-    expect(email.sender).toBe("<contato@modernsystems.com>");
-    expect(email.recipients[0]).toBe("<resgistration.flow@teste.com>");
-    expect(email.subject).toBe("Ative o seu cadastro");
-    expect(email.text).toContain("RegistrationFlow");
-    expect(email.text).toContain(
-      `${newUser.username},\r\n\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/3c8d-46f9-3624cf8f\r\n\nAtenciosamente,\r\nEquipe ModernSystems\n`,
+    expect(lastEmail.sender).toBe("<contato@modernsystems.com>");
+    expect(lastEmail.recipients[0]).toBe("<resgistration.flow@teste.com>");
+    expect(lastEmail.subject).toBe("Ative o seu cadastro");
+    expect(lastEmail.text).toContain("RegistrationFlow");
+    expect(lastEmail.text).toContain(
+      `${newUser.username},\r\n\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/${tokenActivation.id}\r\n\nAtenciosamente,\r\nEquipe ModernSystems\n`,
     );
   });
 });

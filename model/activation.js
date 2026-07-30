@@ -1,6 +1,7 @@
 import email from "infra/email.js";
 import database from "infra/database";
 import webserver from "infra/webserver";
+import { NotFoundError } from "infra/errors";
 
 const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000; // Expires in 15 minutes
 
@@ -56,6 +57,48 @@ export async function findOneByUserId(userId) {
   }
 }
 
+export async function findOneValidByToken(token) {
+  const validToken = await runSelectQuery(token);
+  return validToken;
+
+  async function runSelectQuery(token) {
+    const results = await database.query({
+      text: `
+      
+        SELECT
+
+          *
+
+        FROM
+
+          user_activation_tokens
+
+        WHERE
+
+          id = $1 AND 
+          used_at is Null AND
+          expires_at > NOW()
+
+        LIMIT
+
+          1;
+
+      `,
+      values: [token],
+    });
+
+    if (results.rowCount === 0) {
+      throw new NotFoundError({
+        message:
+          "O token de ativação utilizado não foi encontrado no sistema ou expirou.",
+        action: "Faça um novo cadastro.",
+      });
+    }
+
+    return results.rows[0];
+  }
+}
+
 export async function sendEmailToUser(user, activationToken) {
   await email.send({
     from: "ModernSystems <contato@modernsystems.com>",
@@ -76,6 +119,7 @@ const activation = {
   sendEmailToUser,
   findOneByUserId,
   create,
+  findOneValidByToken,
 };
 
 export default activation;
