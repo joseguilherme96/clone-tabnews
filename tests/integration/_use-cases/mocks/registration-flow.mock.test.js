@@ -147,13 +147,7 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
 
     const lastEmail = await orchestrator.getLastEmail();
 
-    const findWordIndexActivate = lastEmail.text.search("ativar");
-    const wordIndexToken = findWordIndexActivate + 7;
-    const tokenSize = 36;
-    const extractTokenEmailBody = lastEmail.text.substr(
-      wordIndexToken,
-      tokenSize,
-    );
+    const extractTokenEmailBody = orchestrator.extractUUID(lastEmail.text);
     const activationTokenObject = await findOneValidByToken(
       extractTokenEmailBody,
     );
@@ -221,13 +215,7 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
 
     const lastEmail = await orchestrator.getLastEmail();
 
-    const findWordIndexActivate = lastEmail.text.search("ativar");
-    const wordIndexToken = findWordIndexActivate + 7;
-    const tokenSize = 36;
-    const extractTokenEmailBody = lastEmail.text.substr(
-      wordIndexToken,
-      tokenSize,
-    );
+    const extractTokenEmailBody = orchestrator.extractUUID(lastEmail.text);
     const activationTokenObject = await findOneValidByToken(
       extractTokenEmailBody,
     );
