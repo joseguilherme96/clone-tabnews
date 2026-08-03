@@ -2,6 +2,7 @@ import email from "infra/email.js";
 import database from "infra/database";
 import webserver from "infra/webserver";
 import { NotFoundError } from "infra/errors";
+import user from "model/user.js";
 
 const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000; // Expires in 15 minutes
 
@@ -115,11 +116,50 @@ Equipe ModernSystems
   });
 }
 
+async function markTokenAsUsed(token) {
+  const tokenUsed = await runUpdateQuery(token);
+
+  return tokenUsed;
+
+  async function runUpdateQuery(token) {
+    const results = await database.query({
+      text: `
+        UPDATE
+
+          user_activation_tokens
+
+        SET
+        
+          used_at = NOW(),
+          updated_at = timezone('utc', now())
+
+        WHERE 
+
+          id = $1
+
+        RETURNING
+
+          *
+      ;`,
+      values: [token],
+    });
+
+    return results.rows[0];
+  }
+}
+
+async function activateUserByUserId(user_id) {
+  const activateUser = user.setFeatures(user_id, ["create:session"]);
+  return activateUser;
+}
+
 const activation = {
   sendEmailToUser,
   findOneByUserId,
   create,
   findOneValidByToken,
+  markTokenAsUsed,
+  activateUserByUserId,
 };
 
 export default activation;

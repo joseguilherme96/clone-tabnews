@@ -6,24 +6,8 @@ import {
 } from "tests/orchestrator.email";
 import activation from "model/activation.js";
 import webserver from "infra/webserver";
+import user from "model/user";
 
-const fetch = jest.fn(async () => {
-  return new Response(
-    JSON.stringify({
-      id: "3624cf8f-3c8d-46f9-8e3c-64b3a0c61e1",
-      username: "RegistrationFlow",
-      features: ["read:activation_token"],
-      email: "resgistration.flow@teste.com",
-      password: "2b$04$s2ArqnZSfB40/snqVLwuoO.On0wJJcENt/xnH0g0cPqdOSVcwlpRS",
-    }),
-    {
-      status: 201,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
-});
 jest.mock("model/activation.js", () => {
   const originalModule = jest.requireActual("model/activation.js");
 
@@ -105,8 +89,29 @@ beforeAll(async () => {
 
 describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
   let createUserBodyResponse;
+  let newUser;
+  let tokenActivation;
 
   test("Create user account", async () => {
+    const fetch = jest.fn(async () => {
+      return new Response(
+        JSON.stringify({
+          id: "3624cf8f-3c8d-46f9-8e3c-64b3a0c61e1",
+          username: "RegistrationFlow",
+          features: ["read:activation_token"],
+          email: "resgistration.flow@teste.com",
+          password:
+            "2b$04$s2ArqnZSfB40/snqVLwuoO.On0wJJcENt/xnH0g0cPqdOSVcwlpRS",
+        }),
+        {
+          status: 201,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    });
+
     const response = await fetch("http://localhost:3000/api/v1/users", {
       method: "POST",
       headers: {
@@ -184,16 +189,18 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
   });
 
   test("Create a user account and activate token using functions instead of the http://localhost:3000/api/v1/users endpoint", async () => {
-    let newUser = await orchestrator.createUser({
+    newUser = await orchestrator.createUser({
       username: "RegistrationFlow",
       email: "resgistration.flow@teste.com",
       password: "ssss383832",
     });
-    let tokenActivation = await activation.create(newUser);
+    tokenActivation = await activation.create(newUser);
 
     const findToken = await activation.findOneByUserId(newUser.id);
 
     expect(tokenActivation.id).toBe(findToken.id);
+
+    const saveTokenActivation = tokenActivation;
 
     //Mock
     tokenActivation = {
@@ -249,5 +256,29 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
     expect(lastEmail.text).toContain(
       `${newUser.username},\r\n\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/${tokenActivation.id}\r\n\nAtenciosamente,\r\nEquipe ModernSystems\n`,
     );
+
+    //Teardown
+    tokenActivation = saveTokenActivation;
+  });
+
+  test("Activate user", async () => {
+    const activationResponse = await fetch(
+      `http://localhost:3000/api/v1/activations/${tokenActivation.id}`,
+      {
+        method: "PATCH",
+      },
+    );
+
+    expect(activationResponse.status).toBe(200);
+
+    const activationResponseBody = await activationResponse.json();
+
+    expect(Date.parse(activationResponseBody.used_at)).not.toBeNaN();
+
+    const activetedUser = await user.findOneById(
+      activationResponseBody.user_id,
+    );
+
+    expect(String(activetedUser.features)).toBe("create:session");
   });
 });

@@ -2,6 +2,7 @@ import orchestrator from "tests/orchestrator";
 import email from "tests/orchestrator.email";
 import activation from "model/activation.js";
 import webserver from "infra/webserver.js";
+import user from "model/user.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -12,6 +13,7 @@ beforeAll(async () => {
 
 describe("Use case: Resgistration Flow (all sucessful)", () => {
   let createUserBodyResponse;
+  let activationTokenObject;
 
   test("Create user account", async () => {
     const response = await fetch("http://localhost:3000/api/v1/users", {
@@ -45,7 +47,7 @@ describe("Use case: Resgistration Flow (all sucessful)", () => {
     const lastEmail = await orchestrator.getLastEmail();
 
     const extractTokenEmailBody = orchestrator.extractUUID(lastEmail.text);
-    const activationTokenObject = await activation.findOneValidByToken(
+    activationTokenObject = await activation.findOneValidByToken(
       extractTokenEmailBody,
     );
 
@@ -62,5 +64,26 @@ describe("Use case: Resgistration Flow (all sucessful)", () => {
     expect(lastEmail.text).toContain(
       `${createUserBodyResponse.username},\r\n\r\nSegue link de ativação abaixo:\r\n${webserver.origin}/cadastro/ativar/${activationTokenObject.id}\r\n\r\nAtenciosamente,\r\nEquipe ModernSystems\r\n`,
     );
+  });
+
+  test("Activate user", async () => {
+    const activationResponse = await fetch(
+      `http://localhost:3000/api/v1/activations/${activationTokenObject.id}`,
+      {
+        method: "PATCH",
+      },
+    );
+
+    expect(activationResponse.status).toBe(200);
+
+    const activationResponseBody = await activationResponse.json();
+
+    expect(Date.parse(activationResponseBody.used_at)).not.toBeNaN();
+
+    const activetedUser = await user.findOneById(
+      activationResponseBody.user_id,
+    );
+
+    expect(String(activetedUser.features)).toBe("create:session");
   });
 });
