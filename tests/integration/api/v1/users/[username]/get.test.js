@@ -26,7 +26,7 @@ describe("GET /api/v1/users", () => {
         username: "username",
         email: createdUser.email,
         password: responseBody.password,
-        features: ["read:activation_token"],
+        features: ["read:activation_token", "read:session"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -64,7 +64,7 @@ describe("GET /api/v1/users", () => {
         username: "Username1",
         email: createdUser.email,
         password: responseBody.password,
-        features: ["read:activation_token"],
+        features: ["read:activation_token", "read:session"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });

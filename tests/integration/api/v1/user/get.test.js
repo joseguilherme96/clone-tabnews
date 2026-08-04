@@ -2,6 +2,7 @@ import session from "model/session";
 import orchestrator from "tests/orchestrator.js";
 import { version as uuidVersion } from "uuid";
 import SetCookieParser from "set-cookie-parser";
+import user from "model/user.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -37,7 +38,7 @@ describe("GET /api/v1/user", () => {
         username: "UserWithSessionValid",
         email: createdUser.email,
         password: createdUser.password,
-        features: ["read:activation_token"],
+        features: ["read:activation_token", "read:session"],
         created_at: createdUser.created_at.toISOString(),
         updated_at: createdUser.updated_at.toISOString(),
       });
@@ -199,6 +200,58 @@ describe("GET /api/v1/user", () => {
         maxAge: -1,
         path: "/",
         httpOnly: true,
+      });
+    });
+
+    test("Banned user", async () => {
+      const newUser = await orchestrator.createUser({
+        username: "RegistrationFlow",
+        email: "resgistration.flow@teste.com",
+        password: "ssss383832",
+      });
+
+      const createdSessionResponse = await fetch(
+        "http://localhost:3000/api/v1/sessions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: newUser.email,
+            password: "ssss383832",
+          }),
+        },
+      );
+
+      const sessionActiveUser = await user.findOneByEmail(
+        "resgistration.flow@teste.com",
+      );
+      await user.setFeatures(sessionActiveUser.id, []);
+
+      const createdSessionResponseBody = await createdSessionResponse.json();
+
+      const bannedUserSessionResponse = await fetch(
+        "http://localhost:3000/api/v1/user",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${createdSessionResponseBody.token}`,
+          },
+        },
+      );
+
+      expect(bannedUserSessionResponse.status).toBe(403);
+
+      const bannedUserSessionResponseBody =
+        await bannedUserSessionResponse.json();
+
+      expect(bannedUserSessionResponseBody).toEqual({
+        name: "ForbiddenError",
+        message: "Usuário não tem permissão para executar esta ação.",
+        action: `Verifique se o seu usuário possui a feature read:session.`,
+        status_code: 403,
       });
     });
   });

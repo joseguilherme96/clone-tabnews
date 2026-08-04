@@ -98,7 +98,7 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
         JSON.stringify({
           id: "3624cf8f-3c8d-46f9-8e3c-64b3a0c61e1",
           username: "RegistrationFlow",
-          features: ["read:activation_token"],
+          features: ["read:activation_token", "read:session"],
           email: "resgistration.flow@teste.com",
           password:
             "2b$04$s2ArqnZSfB40/snqVLwuoO.On0wJJcENt/xnH0g0cPqdOSVcwlpRS",
@@ -130,9 +130,10 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
 
     expect(createUserBodyResponse.id).toBe(createUserBodyResponse.id);
     expect(createUserBodyResponse.username).toBe("RegistrationFlow");
-    expect(String(createUserBodyResponse.features[0])).toBe(
+    expect(createUserBodyResponse.features).toEqual([
       "read:activation_token",
-    );
+      "read:session",
+    ]);
     expect(createUserBodyResponse.email).toBe("resgistration.flow@teste.com");
     expect(createUserBodyResponse.password).toBe(
       createUserBodyResponse.password,
@@ -280,5 +281,30 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
     );
 
     expect(String(activetedUser.features)).toBe("create:session");
+  });
+
+  test("Login", async () => {
+    const createdSessionResponse = await fetch(
+      "http://localhost:3000/api/v1/sessions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: newUser.email,
+          password: "ssss383832",
+        }),
+      },
+    );
+
+    expect(createdSessionResponse.status).toBe(201);
+
+    const createdSessionResponseBody = await createdSessionResponse.json();
+
+    expect(createdSessionResponse.headers.get("set-cookie")).toBe(
+      `session_id=${createdSessionResponseBody.token}; Max-Age=2592000; Path=/; HttpOnly`,
+    );
+    expect(createdSessionResponseBody.user_id).toBe(newUser.id);
   });
 });
