@@ -34,10 +34,10 @@ describe("Use case: Resgistration Flow (all sucessful)", () => {
 
     expect(createUserBodyResponse.id).toBe(createUserBodyResponse.id);
     expect(createUserBodyResponse.username).toBe("RegistrationFlow");
-    expect(createUserBodyResponse.features).toEqual(
+    expect(createUserBodyResponse.features).toEqual([
       "read:activation_token",
       "read:session",
-    );
+    ]);
     expect(createUserBodyResponse.email).toBe("resgistration.flow@teste.com");
     expect(createUserBodyResponse.password).toBe(
       createUserBodyResponse.password,
