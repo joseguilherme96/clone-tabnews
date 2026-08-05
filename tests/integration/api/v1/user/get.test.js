@@ -210,6 +210,8 @@ describe("GET /api/v1/user", () => {
         password: "ssss383832",
       });
 
+      await orchestrator.activateUser(newUser);
+
       const createdSessionResponse = await fetch(
         "http://localhost:3000/api/v1/sessions",
         {

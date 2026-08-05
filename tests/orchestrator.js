@@ -8,6 +8,7 @@ import orchestratorEmail, {
   getEmails,
   getEmailById,
 } from "tests/orchestrator.email.js";
+import activation from "model/activation";
 
 async function waitForAllServices() {
   await waitForWebServer();
@@ -84,6 +85,10 @@ function extractUUID(text) {
   return match ? match[0] : null;
 }
 
+async function activateUser(inactiveUser) {
+  return await activation.activateUserByUserId(inactiveUser.id);
+}
+
 const orchestrator = {
   waitForAllServices: waitForAllServices,
   cleanDataBase: cleanDataBase,
@@ -92,6 +97,7 @@ const orchestrator = {
   createSession: createSession,
   getLastEmail: getLastEmail,
   extractUUID: extractUUID,
+  activateUser: activateUser,
 };
 
 export default orchestrator;
