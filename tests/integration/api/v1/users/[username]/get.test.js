@@ -15,6 +15,8 @@ describe("GET /api/v1/users", () => {
         username: "username",
       });
 
+      await orchestrator.activateUser(createdUser);
+
       const responseFindUserByUsername = await fetch(
         "http://localhost:3000/api/v1/users/username",
       );
@@ -26,7 +28,7 @@ describe("GET /api/v1/users", () => {
         username: "username",
         email: createdUser.email,
         password: responseBody.password,
-        features: ["read:activation_token", "read:session"],
+        features: ["create:session", "read:session"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -53,6 +55,8 @@ describe("GET /api/v1/users", () => {
         username: "Username1",
       });
 
+      await orchestrator.activateUser(createdUser);
+
       const responseFindUserByUsername = await fetch(
         `http://localhost:3000/api/v1/users/USERNAME1`,
       );
@@ -64,7 +68,7 @@ describe("GET /api/v1/users", () => {
         username: "Username1",
         email: createdUser.email,
         password: responseBody.password,
-        features: ["read:activation_token", "read:session"],
+        features: ["create:session", "read:session"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });

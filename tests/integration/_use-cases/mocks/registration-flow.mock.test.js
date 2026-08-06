@@ -280,7 +280,7 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
       activationResponseBody.user_id,
     );
 
-    expect(String(activetedUser.features)).toBe("create:session");
+    expect(activetedUser.features).toEqual(["create:session", "read:session"]);
   });
 
   test("Login", async () => {

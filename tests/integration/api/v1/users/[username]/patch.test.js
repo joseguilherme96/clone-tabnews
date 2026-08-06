@@ -103,6 +103,8 @@ describe("PATCH /api/v1/users/", () => {
         username: "uniqueUser1",
       });
 
+      await orchestrator.activateUser(createdUser);
+
       const response = await fetch(
         "http://localhost:3000/api/v1/users/uniqueUser1",
         {
@@ -124,7 +126,7 @@ describe("PATCH /api/v1/users/", () => {
         username: "uniqueUser2",
         email: createdUser.email,
         password: responseBody.password,
-        features: ["read:activation_token", "read:session"],
+        features: ["create:session", "read:session"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -140,6 +142,8 @@ describe("PATCH /api/v1/users/", () => {
       const createdUser = await orchestrator.createUser({
         email: "uniqueEmail1@outlook.com.br",
       });
+
+      await orchestrator.activateUser(createdUser);
 
       const response = await fetch(
         `http://localhost:3000/api/v1/users/${createdUser.username}`,
@@ -162,7 +166,7 @@ describe("PATCH /api/v1/users/", () => {
         username: createdUser.username,
         email: "uniqueEmail2@outlook.com.br",
         password: responseBody.password,
-        features: ["read:activation_token", "read:session"],
+        features: ["create:session", "read:session"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -178,6 +182,9 @@ describe("PATCH /api/v1/users/", () => {
       const createdUser = await orchestrator.createUser({
         password: "242424242",
       });
+
+      await orchestrator.activateUser(createdUser);
+
       const response = await fetch(
         `http://localhost:3000/api/v1/users/${createdUser.username}`,
         {
@@ -200,7 +207,7 @@ describe("PATCH /api/v1/users/", () => {
         username: createdUser.username,
         email: createdUser.email,
         password: responseBody.password,
-        features: ["read:activation_token", "read:session"],
+        features: ["create:session", "read:session"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
