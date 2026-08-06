@@ -14,6 +14,7 @@ beforeAll(async () => {
 describe("Use case: Resgistration Flow (all sucessful)", () => {
   let createUserBodyResponse;
   let activationTokenObject;
+  let createdSessionResponseBody;
 
   test("Create user account", async () => {
     const response = await fetch("http://localhost:3000/api/v1/users", {
@@ -105,11 +106,27 @@ describe("Use case: Resgistration Flow (all sucessful)", () => {
 
     expect(createdSessionResponse.status).toBe(201);
 
-    const createdSessionResponseBody = await createdSessionResponse.json();
+    createdSessionResponseBody = await createdSessionResponse.json();
 
     expect(createdSessionResponse.headers.get("set-cookie")).toBe(
       `session_id=${createdSessionResponseBody.token}; Max-Age=2592000; Path=/; HttpOnly`,
     );
     expect(createdSessionResponseBody.user_id).toBe(createUserBodyResponse.id);
+  });
+
+  test("Get user information", async () => {
+    const response = await fetch("http://localhost:3000/api/v1/user", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `session_id=${createdSessionResponseBody.token}`,
+      },
+    });
+
+    expect(response.status).toBe(200);
+
+    const responseBody = await response.json();
+
+    expect(responseBody.id).toBe(createUserBodyResponse.id);
   });
 });
