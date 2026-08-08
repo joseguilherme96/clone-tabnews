@@ -1,10 +1,12 @@
 import { createRouter } from "next-connect";
 import controller from "infra/controler";
 import activation from "model/activation";
+import user from "model/user";
 
 const router = createRouter();
 
-router.patch(patchHandler);
+router.use(controller.injectAnonymousOrUser);
+router.patch(controller.canRequest("read:activation_token"), patchHandler);
 
 export default router.handler({
   onError: controller.errorHandlers.onErrorHandler,
@@ -13,6 +15,8 @@ export default router.handler({
 
 async function patchHandler(request, response) {
   const token = request.query.token_id;
+
+  await user.userCanActivateToken(token);
 
   const validActivationToken = await activation.findOneValidByToken(token);
 

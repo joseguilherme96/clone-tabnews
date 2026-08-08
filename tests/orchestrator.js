@@ -89,6 +89,14 @@ async function activateUser(inactiveUser) {
   return await activation.activateUserByUserId(inactiveUser.id);
 }
 
+async function tokenActivation(newUser) {
+  return await activation.create(newUser);
+}
+
+function activationTokenExpirationTime() {
+  return activation.EXPIRATION_IN_MILLISECONDS;
+}
+
 const orchestrator = {
   waitForAllServices: waitForAllServices,
   cleanDataBase: cleanDataBase,
@@ -98,6 +106,8 @@ const orchestrator = {
   getLastEmail: getLastEmail,
   extractUUID: extractUUID,
   activateUser: activateUser,
+  tokenActivation: tokenActivation,
+  activationTokenExpirationTime: activationTokenExpirationTime,
 };
 
 export default orchestrator;

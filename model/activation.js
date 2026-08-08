@@ -100,6 +100,46 @@ export async function findOneValidByToken(token) {
   }
 }
 
+export async function findOneByToken(token) {
+  const validToken = await runSelectQuery(token);
+  return validToken;
+
+  async function runSelectQuery(token) {
+    const results = await database.query({
+      text: `
+      
+        SELECT
+
+          *
+
+        FROM
+
+          user_activation_tokens
+
+        WHERE
+
+          id = $1
+
+        LIMIT
+
+          1;
+
+      `,
+      values: [token],
+    });
+
+    if (results.rowCount === 0) {
+      throw new NotFoundError({
+        message:
+          "O token de ativação utilizado não foi encontrado no sistema ou expirou.",
+        action: "Faça um novo cadastro.",
+      });
+    }
+
+    return results.rows[0];
+  }
+}
+
 export async function sendEmailToUser(user, activationToken) {
   await email.send({
     from: "ModernSystems <contato@modernsystems.com>",
@@ -148,8 +188,8 @@ async function markTokenAsUsed(token) {
   }
 }
 
-async function activateUserByUserId(user_id) {
-  const activateUser = user.setFeatures(user_id, [
+async function activateUserByUserId(userId) {
+  const activateUser = user.setFeatures(userId, [
     "create:session",
     "read:session",
   ]);
@@ -163,6 +203,8 @@ const activation = {
   findOneValidByToken,
   markTokenAsUsed,
   activateUserByUserId,
+  findOneByToken,
+  EXPIRATION_IN_MILLISECONDS,
 };
 
 export default activation;

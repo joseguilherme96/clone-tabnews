@@ -3,8 +3,11 @@ import {
   ValidationError,
   NotFoundError,
   UnauthorizedError,
+  ForbiddenError,
 } from "infra/errors.js";
 import password from "model/password";
+import activation from "model/activation.js";
+import authorization from "model/authorization.js";
 
 async function create(inputCreateUser) {
   await validateUniqueUsername(inputCreateUser.username);
@@ -296,6 +299,18 @@ async function setFeatures(userId, feature) {
   }
 }
 
+async function userCanActivateToken(token) {
+  const tokenToActive = await activation.findOneByToken(token);
+  const userToActive = await user.findOneById(tokenToActive.user_id);
+
+  if (!authorization.can(userToActive, "read:activation_token")) {
+    throw new ForbiddenError({
+      message: "Você não pode mais utilizar tokens de ativação.",
+      action: "Entre em contato com o suporte.",
+    });
+  }
+}
+
 const user = {
   create,
   findOneByUsername,
@@ -303,6 +318,7 @@ const user = {
   findOneById,
   update,
   setFeatures,
+  userCanActivateToken,
 };
 
 export default user;
