@@ -35,10 +35,7 @@ describe("Use case: Resgistration Flow (all sucessful)", () => {
 
     expect(createUserBodyResponse.id).toBe(createUserBodyResponse.id);
     expect(createUserBodyResponse.username).toBe("RegistrationFlow");
-    expect(createUserBodyResponse.features).toEqual([
-      "read:activation_token",
-      "read:session",
-    ]);
+    expect(createUserBodyResponse.features).toEqual(["read:activation_token"]);
     expect(createUserBodyResponse.email).toBe("resgistration.flow@teste.com");
     expect(createUserBodyResponse.password).toBe(
       createUserBodyResponse.password,
@@ -86,7 +83,7 @@ describe("Use case: Resgistration Flow (all sucessful)", () => {
       activationResponseBody.user_id,
     );
 
-    expect(String(activetedUser.features)).toBe("create:session");
+    expect(activetedUser.features).toEqual(["create:session", "read:session"]);
   });
 
   test("Login", async () => {

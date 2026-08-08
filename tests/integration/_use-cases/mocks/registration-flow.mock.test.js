@@ -99,7 +99,7 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
         JSON.stringify({
           id: "3624cf8f-3c8d-46f9-8e3c-64b3a0c61e1",
           username: "RegistrationFlow",
-          features: ["read:activation_token", "read:session"],
+          features: ["read:activation_token"],
           email: "resgistration.flow@teste.com",
           password:
             "2b$04$s2ArqnZSfB40/snqVLwuoO.On0wJJcENt/xnH0g0cPqdOSVcwlpRS",
@@ -131,10 +131,7 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
 
     expect(createUserBodyResponse.id).toBe(createUserBodyResponse.id);
     expect(createUserBodyResponse.username).toBe("RegistrationFlow");
-    expect(createUserBodyResponse.features).toEqual([
-      "read:activation_token",
-      "read:session",
-    ]);
+    expect(createUserBodyResponse.features).toEqual(["read:activation_token"]);
     expect(createUserBodyResponse.email).toBe("resgistration.flow@teste.com");
     expect(createUserBodyResponse.password).toBe(
       createUserBodyResponse.password,
