@@ -66,9 +66,10 @@ describe("POST /api/v1/activations/[token_id]", () => {
       expect(Date.parse(activationResponseBody.expires_at)).not.toBeNaN();
       expect(Date.parse(activationResponseBody.updated_at)).not.toBeNaN();
 
-      expect(activationResponseBody.created_at > createdUser.created_at).toBe(
-        true,
-      );
+      expect(
+        activationResponseBody.created_at >
+          createdUser.created_at.toISOString(),
+      ).toBe(true);
       expect(
         activationResponseBody.expires_at > activationResponseBody.created_at,
       ).toBe(true);
