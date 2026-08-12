@@ -91,7 +91,11 @@ describe("POST /api/v1/activations/[token_id]", () => {
         activationResponseBody.user_id,
       );
 
-      expect(activedUser.features).toEqual(["create:session", "read:session"]);
+      expect(activedUser.features).toEqual([
+        "create:session",
+        "read:session",
+        "update:user",
+      ]);
     });
 
     test("With expired token", async () => {
