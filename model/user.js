@@ -299,6 +299,35 @@ async function setFeatures(userId, feature) {
   }
 }
 
+async function addFeatures(userId, feature) {
+  const newFeature = await runUpdateQuery(userId, feature);
+
+  return newFeature;
+
+  async function runUpdateQuery(userId, feature) {
+    const results = await database.query({
+      text: `
+        UPDATE
+          users
+        SET
+          features = array_cat(features, $2),
+          updated_at = timezone('utc', now())
+
+        WHERE 
+
+          id = $1
+
+        RETURNING
+
+          *
+      ;`,
+      values: [userId, feature],
+    });
+
+    return results.rows[0];
+  }
+}
+
 async function userCanActivateToken(token) {
   const tokenToActive = await activation.findOneByToken(token);
   const userToActive = await user.findOneById(tokenToActive.user_id);
@@ -319,6 +348,7 @@ const user = {
   update,
   setFeatures,
   userCanActivateToken,
+  addFeatures,
 };
 
 export default user;

@@ -1,7 +1,7 @@
 import retry from "async-retry";
 import database from "infra/database";
 import migrator from "model/migrator.js";
-import user from "model/user";
+import user from "model/user.js";
 import { faker } from "@faker-js/faker";
 import session from "model/session";
 import orchestratorEmail, {
@@ -97,6 +97,10 @@ function activationTokenExpirationTime() {
   return activation.EXPIRATION_IN_MILLISECONDS;
 }
 
+async function addFeaturesToUser(activatedUser, feature) {
+  return await user.addFeatures(activatedUser.id, feature);
+}
+
 const orchestrator = {
   waitForAllServices: waitForAllServices,
   cleanDataBase: cleanDataBase,
@@ -108,6 +112,7 @@ const orchestrator = {
   activateUser: activateUser,
   tokenActivation: tokenActivation,
   activationTokenExpirationTime: activationTokenExpirationTime,
+  addFeaturesToUser: addFeaturesToUser,
 };
 
 export default orchestrator;

@@ -320,4 +320,53 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
     });
   });
+  describe("Privileged user", () => {
+    test("With an userA modifying userB", async () => {
+      const createdUserA = await orchestrator.createUser();
+      const activatedUserA = await orchestrator.activateUser(createdUserA);
+      await orchestrator.addFeaturesToUser(activatedUserA, [
+        "update:user:others",
+      ]);
+      const createdUserASession = await orchestrator.createSession(
+        activatedUserA.id,
+      );
+
+      const createdUserB = await orchestrator.createUser();
+      const activatedUserB = await orchestrator.activateUser(createdUserB);
+
+      const response = await fetch(
+        `http://localhost:3000/api/v1/users/${activatedUserB.username}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            cookie: `session_id=${createdUserASession.token}`,
+          },
+          body: JSON.stringify({
+            username: "UserAPodeAlterarUserB",
+          }),
+        },
+      );
+
+      expect(response.status).toBe(201);
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
+        id: responseBody.id,
+        username: "UserAPodeAlterarUserB",
+        email: createdUserB.email,
+        password: responseBody.password,
+        features: ["create:session", "read:session", "update:user"],
+        created_at: responseBody.created_at,
+        updated_at: responseBody.updated_at,
+      });
+
+      expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(Date.parse(responseBody.created_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
+
+      expect(responseBody.updated_at > responseBody.created_at).toBe(true);
+    });
+  });
 });
