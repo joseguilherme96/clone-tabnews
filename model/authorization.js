@@ -1,4 +1,33 @@
+import { InternalServerError } from "infra/errors";
+
+const availableFeatures = [
+  //user
+  "create:user",
+  "read:user",
+  "read:user:self",
+  "update:user",
+  "update:user:others",
+
+  //session
+  "read:session",
+  "create:session",
+
+  //activation
+  "read:activation_token",
+
+  //migration
+  "read:migration",
+  "create:migration",
+
+  //status
+  "read:status",
+  "read:status:all",
+];
+
 function can(user, feature, resource) {
+  validateUser(user);
+  validateFeature(feature);
+
   let authorized = false;
 
   if (user.features.includes(feature)) {
@@ -17,6 +46,10 @@ function can(user, feature, resource) {
 }
 
 function filterOutput(user, feature, resource) {
+  validateUser(user);
+  validateFeature(feature);
+  validateResource(resource);
+
   if (feature === "read:user") {
     return {
       id: resource.id,
@@ -78,12 +111,38 @@ function filterOutput(user, feature, resource) {
       },
     };
 
-    if (can(user, "read:status:all")) {
+    if (can(user, "read:status:all", resource)) {
       output.dependencies.database.version =
         resource.dependencies.database.version;
     }
 
     return output;
+  }
+}
+
+function validateUser(user) {
+  if (!user || !user.features) {
+    throw new InternalServerError({
+      cause: "A função .can() precisa que seja passado como argumento o user.",
+    });
+  }
+}
+
+function validateFeature(feature) {
+  if (!feature || !availableFeatures.includes(feature)) {
+    throw new InternalServerError({
+      cause:
+        "È necessário fornecer uma `feaure` conhecida no model `authorization`.",
+    });
+  }
+}
+
+function validateResource(resource) {
+  if (!resource) {
+    throw new InternalServerError({
+      cause:
+        "È necessário fornecer uma `resource` conhecido no model `authorization`.",
+    });
   }
 }
 
