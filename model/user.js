@@ -3,13 +3,18 @@ import {
   ValidationError,
   NotFoundError,
   UnauthorizedError,
+  ForbiddenError,
 } from "infra/errors.js";
 import password from "model/password";
+import activation from "model/activation.js";
+import authorization from "model/authorization.js";
 
 async function create(inputCreateUser) {
   await validateUniqueUsername(inputCreateUser.username);
   await validateUniqueEmail(inputCreateUser.email);
   await hashPasswordInObject(inputCreateUser);
+
+  await injectDefaultFeaturesInObject(inputCreateUser);
 
   const newUser = await runInsertQuery(inputCreateUser);
   return newUser;
@@ -18,9 +23,9 @@ async function create(inputCreateUser) {
     const results = await database.query({
       text: `
         INSERT INTO
-          users (username, email, password)
+          users (username, email, password, features)
             VALUES
-          ($1, $2, $3)
+          ($1, $2, $3, $4)
             RETURNING
 
             *
@@ -32,10 +37,15 @@ async function create(inputCreateUser) {
         inputCreateUser.username,
         inputCreateUser.email,
         inputCreateUser.password,
+        inputCreateUser.features,
       ],
     });
 
     return results.rows[0];
+  }
+
+  async function injectDefaultFeaturesInObject(inputCreateUser) {
+    inputCreateUser.features = ["read:activation_token"];
   }
 }
 
@@ -260,12 +270,85 @@ async function validateUniqueUsername(username) {
   }
 }
 
+async function setFeatures(userId, feature) {
+  const newFeature = await runUpdateQuery(userId, feature);
+
+  return newFeature;
+
+  async function runUpdateQuery(userId, feature) {
+    const results = await database.query({
+      text: `
+        UPDATE
+          users
+        SET
+          features = $2,
+          updated_at = timezone('utc', now())
+
+        WHERE 
+
+          id = $1
+
+        RETURNING
+
+          *
+      ;`,
+      values: [userId, feature],
+    });
+
+    return results.rows[0];
+  }
+}
+
+async function addFeatures(userId, feature) {
+  const newFeature = await runUpdateQuery(userId, feature);
+
+  return newFeature;
+
+  async function runUpdateQuery(userId, feature) {
+    const results = await database.query({
+      text: `
+        UPDATE
+          users
+        SET
+          features = array_cat(features, $2),
+          updated_at = timezone('utc', now())
+
+        WHERE 
+
+          id = $1
+
+        RETURNING
+
+          *
+      ;`,
+      values: [userId, feature],
+    });
+
+    return results.rows[0];
+  }
+}
+
+async function userCanActivateToken(token) {
+  const tokenToActive = await activation.findOneByToken(token);
+  const userToActive = await user.findOneById(tokenToActive.user_id);
+
+  if (!authorization.can(userToActive, "read:activation_token")) {
+    throw new ForbiddenError({
+      message: "Você não pode mais utilizar tokens de ativação.",
+      action: "Entre em contato com o suporte.",
+    });
+  }
+}
+
 const user = {
   create,
   findOneByUsername,
   findOneByEmail,
   findOneById,
   update,
+  setFeatures,
+  userCanActivateToken,
+  addFeatures,
 };
 
 export default user;

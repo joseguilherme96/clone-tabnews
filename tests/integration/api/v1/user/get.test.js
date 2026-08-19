@@ -2,6 +2,7 @@ import session from "model/session";
 import orchestrator from "tests/orchestrator.js";
 import { version as uuidVersion } from "uuid";
 import SetCookieParser from "set-cookie-parser";
+import user from "model/user.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -10,11 +11,29 @@ beforeAll(async () => {
 });
 
 describe("GET /api/v1/user", () => {
+  describe("Anonymous user", () => {
+    test("Retrieving the endpoint", async () => {
+      const response = await fetch("http://localhost:3000/api/v1/user");
+
+      expect(response.status).toBe(403);
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
+        name: "ForbiddenError",
+        message: "Usuário não tem permissão para executar esta ação.",
+        action: `Verifique se o seu usuário possui a feature read:session.`,
+        status_code: 403,
+      });
+    });
+  });
   describe("Default User", () => {
     test("With valid Session", async () => {
       const createdUser = await orchestrator.createUser({
         username: "UserWithSessionValid",
       });
+
+      const activation = await orchestrator.activateUser(createdUser);
 
       const createSession = await orchestrator.createSession(createdUser.id);
       const response = await fetch("http://localhost:3000/api/v1/user", {
@@ -35,10 +54,9 @@ describe("GET /api/v1/user", () => {
       expect(responseBody).toEqual({
         id: createdUser.id,
         username: "UserWithSessionValid",
-        email: createdUser.email,
-        password: createdUser.password,
+        features: ["create:session", "read:session", "update:user"],
         created_at: createdUser.created_at.toISOString(),
-        updated_at: createdUser.updated_at.toISOString(),
+        updated_at: activation.updated_at.toISOString(),
       });
 
       expect(uuidVersion(responseBody.id)).toBe(4);
@@ -88,6 +106,8 @@ describe("GET /api/v1/user", () => {
         username: "UserWithInvalidSession",
       });
 
+      await orchestrator.activateUser(createdUser);
+
       const createSession = await orchestrator.createSession(createdUser.id);
 
       jest.useRealTimers();
@@ -132,6 +152,8 @@ describe("GET /api/v1/user", () => {
         username: "SessionExpiresIn1Day",
       });
 
+      await orchestrator.activateUser(createdUser);
+
       const createSession = await orchestrator.createSession(createdUser.id);
       jest.useRealTimers();
 
@@ -154,6 +176,8 @@ describe("GET /api/v1/user", () => {
       const createdUser = await orchestrator.createUser({
         username: "SessionExpiresIn1Second",
       });
+
+      await orchestrator.activateUser(createdUser);
 
       const createSession = await orchestrator.createSession(createdUser.id);
       jest.useRealTimers();
@@ -198,6 +222,60 @@ describe("GET /api/v1/user", () => {
         maxAge: -1,
         path: "/",
         httpOnly: true,
+      });
+    });
+
+    test("Banned user", async () => {
+      const newUser = await orchestrator.createUser({
+        username: "RegistrationFlow",
+        email: "resgistration.flow@teste.com",
+        password: "ssss383832",
+      });
+
+      await orchestrator.activateUser(newUser);
+
+      const createdSessionResponse = await fetch(
+        "http://localhost:3000/api/v1/sessions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: newUser.email,
+            password: "ssss383832",
+          }),
+        },
+      );
+
+      const sessionActiveUser = await user.findOneByEmail(
+        "resgistration.flow@teste.com",
+      );
+      await user.setFeatures(sessionActiveUser.id, []);
+
+      const createdSessionResponseBody = await createdSessionResponse.json();
+
+      const bannedUserSessionResponse = await fetch(
+        "http://localhost:3000/api/v1/user",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${createdSessionResponseBody.token}`,
+          },
+        },
+      );
+
+      expect(bannedUserSessionResponse.status).toBe(403);
+
+      const bannedUserSessionResponseBody =
+        await bannedUserSessionResponse.json();
+
+      expect(bannedUserSessionResponseBody).toEqual({
+        name: "ForbiddenError",
+        message: "Usuário não tem permissão para executar esta ação.",
+        action: `Verifique se o seu usuário possui a feature read:session.`,
+        status_code: 403,
       });
     });
   });

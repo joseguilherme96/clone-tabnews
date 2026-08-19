@@ -1,13 +1,14 @@
 import retry from "async-retry";
 import database from "infra/database";
 import migrator from "model/migrator.js";
-import user from "model/user";
+import user from "model/user.js";
 import { faker } from "@faker-js/faker";
 import session from "model/session";
 import orchestratorEmail, {
   getEmails,
   getEmailById,
 } from "tests/orchestrator.email.js";
+import activation from "model/activation";
 
 async function waitForAllServices() {
   await waitForWebServer();
@@ -69,10 +70,35 @@ async function getLastEmail() {
   const emails = await getEmails();
   const lastEmailItem = emails.pop();
 
+  if (!lastEmailItem) {
+    return null;
+  }
+
   const emailTextBody = await getEmailById(lastEmailItem.id);
   lastEmailItem.text = emailTextBody;
 
   return lastEmailItem;
+}
+
+function extractUUID(text) {
+  const match = text.match(/[0-9a-fA-F-]{36}/);
+  return match ? match[0] : null;
+}
+
+async function activateUser(inactiveUser) {
+  return await activation.activateUserByUserId(inactiveUser.id);
+}
+
+async function tokenActivation(newUser) {
+  return await activation.create(newUser);
+}
+
+function activationTokenExpirationTime() {
+  return activation.EXPIRATION_IN_MILLISECONDS;
+}
+
+async function addFeaturesToUser(activatedUser, feature) {
+  return await user.addFeatures(activatedUser.id, feature);
 }
 
 const orchestrator = {
@@ -82,6 +108,11 @@ const orchestrator = {
   createUser: createUser,
   createSession: createSession,
   getLastEmail: getLastEmail,
+  extractUUID: extractUUID,
+  activateUser: activateUser,
+  tokenActivation: tokenActivation,
+  activationTokenExpirationTime: activationTokenExpirationTime,
+  addFeaturesToUser: addFeaturesToUser,
 };
 
 export default orchestrator;

@@ -29,8 +29,7 @@ describe("POST /api/v1/users", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "joseguilherme96",
-        email: "jose.guilherme96@outlook.com.br",
-        password: responseBody.password,
+        features: ["read:activation_token"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -106,6 +105,55 @@ describe("POST /api/v1/users", () => {
         message: "O username informado já está sendo utilizado.",
         action: "Utilize outro username para realizar está operação.",
         status_code: 400,
+      });
+    });
+
+    test("With create:user feature", async () => {
+      const response = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: "UsuarioNaoLogado",
+          email: "usuario.nao.logado@outlook.com.br",
+          password: "ssss44",
+        }),
+      });
+
+      expect(response.status).toBe(201);
+    });
+  });
+
+  describe("Default user", () => {
+    test("Without create:user feature", async () => {
+      const createdUser = await orchestrator.createUser();
+      await orchestrator.tokenActivation(createdUser);
+      await orchestrator.activateUser(createdUser);
+      const createdSession = await orchestrator.createSession(createdUser.id);
+
+      const response = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `session_id=${createdSession.token}`,
+        },
+        body: JSON.stringify({
+          username: "UsuarioLogado",
+          email: "usuario.logado@outlook.com.br",
+          password: "sss",
+        }),
+      });
+
+      expect(response.status).toBe(403);
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
+        name: "ForbiddenError",
+        message: "Usuário não tem permissão para executar esta ação.",
+        action: "Verifique se o seu usuário possui a feature create:user.",
+        status_code: 403,
       });
     });
   });
