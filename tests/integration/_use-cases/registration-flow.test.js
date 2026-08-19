@@ -36,10 +36,6 @@ describe("Use case: Resgistration Flow (all sucessful)", () => {
     expect(createUserBodyResponse.id).toBe(createUserBodyResponse.id);
     expect(createUserBodyResponse.username).toBe("RegistrationFlow");
     expect(createUserBodyResponse.features).toEqual(["read:activation_token"]);
-    expect(createUserBodyResponse.email).toBe("resgistration.flow@teste.com");
-    expect(createUserBodyResponse.password).toBe(
-      createUserBodyResponse.password,
-    );
   });
 
   test("Received activate email", async () => {
@@ -99,7 +95,7 @@ describe("Use case: Resgistration Flow (all sucessful)", () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: createUserBodyResponse.email,
+          email: "resgistration.flow@teste.com",
           password: "ssss383832",
         }),
       },

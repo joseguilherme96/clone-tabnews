@@ -1,4 +1,3 @@
-import password from "model/password.js";
 import orchestrator from "tests/orchestrator";
 import { version as uuidVersion } from "uuid";
 
@@ -169,8 +168,6 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "uniqueUser2",
-        email: createdUser.email,
-        password: responseBody.password,
         features: ["create:session", "read:session", "update:user"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -213,8 +210,6 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: createdUser.username,
-        email: "uniqueEmail2@outlook.com.br",
-        password: responseBody.password,
         features: ["create:session", "read:session", "update:user"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -258,8 +253,6 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: createdUser.username,
-        email: createdUser.email,
-        password: responseBody.password,
         features: ["create:session", "read:session", "update:user"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -270,18 +263,6 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
 
       expect(responseBody.updated_at > responseBody.created_at).toBe(true);
-
-      const correctPasswordMatch = await password.compare(
-        "45332222",
-        responseBody.password,
-      );
-      const incorrectPasswordMatch = await password.compare(
-        "453322222",
-        responseBody.password,
-      );
-
-      expect(correctPasswordMatch).toBe(true);
-      expect(incorrectPasswordMatch).toBe(false);
     });
 
     test("With an userA modifying userB", async () => {
@@ -355,8 +336,6 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "UserAPodeAlterarUserB",
-        email: createdUserB.email,
-        password: responseBody.password,
         features: ["create:session", "read:session", "update:user"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
