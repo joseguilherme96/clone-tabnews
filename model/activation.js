@@ -142,7 +142,7 @@ export async function findOneByToken(token) {
 
 export async function sendEmailToUser(user, activationToken) {
   await email.send({
-    from: "ModernSystems <contato@modernsystems.com>",
+    from: "ModernSystems <contato@modernsystems.com.br>",
     to: `${user.email}`,
     subject: "Ative o seu cadastro",
     text: `${user.username},
