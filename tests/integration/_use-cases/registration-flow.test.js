@@ -50,7 +50,7 @@ describe("Use case: Resgistration Flow (all sucessful)", () => {
     expect(activationTokenObject.user_id).toBe(createUserBodyResponse.id);
     expect(activationTokenObject.used_at).toBe(null);
 
-    expect(lastEmail.sender).toBe("<contato@modernsystems.com>");
+    expect(lastEmail.sender).toBe("<contato@modernsystems.com.br>");
     expect(lastEmail.recipients[0]).toBe("<resgistration.flow@teste.com>");
     expect(lastEmail.subject).toBe("Ative o seu cadastro");
     expect(lastEmail.text).toContain(`${createUserBodyResponse.username}`);
