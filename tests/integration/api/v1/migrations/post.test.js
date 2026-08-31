@@ -9,7 +9,7 @@ beforeAll(async () => {
 
 describe("POST /api/v1/migrations", () => {
   describe("Anonymous User", () => {
-    test("Run pending migrations without the create:migration feature", async () => {
+    test("Running pending migrations without the create:migration feature", async () => {
       const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
         method: "POST",
       });
@@ -27,7 +27,7 @@ describe("POST /api/v1/migrations", () => {
     });
   });
   describe("Default User", () => {
-    test("Run pending migrations without the create:migration feature", async () => {
+    test("Running pending migrations without the create:migration feature", async () => {
       const createdUser = await orchestrator.createUser();
       const activatedUser = await orchestrator.activateUser(createdUser);
       const createdUserSession = await orchestrator.createSession(
@@ -54,7 +54,7 @@ describe("POST /api/v1/migrations", () => {
   });
 
   describe("Privileged User", () => {
-    test("Run pending migrations with create:migration feature", async () => {
+    test("Running pending migrations with create:migration feature", async () => {
       const createdUser = await orchestrator.createUser();
       const activatedUser = await orchestrator.activateUser(createdUser);
       await orchestrator.addFeaturesToUser(activatedUser, ["create:migration"]);
