@@ -9,6 +9,7 @@ import orchestratorEmail, {
   getEmailById,
 } from "tests/orchestrator.email.js";
 import activation from "model/activation";
+import webserver from "infra/webserver.js";
 
 async function waitForAllServices() {
   await waitForWebServer();
@@ -21,7 +22,7 @@ async function waitForAllServices() {
     });
 
     async function fetchStatusPage() {
-      const response = await fetch("http://localhost:3000/api/v1/status");
+      const response = await fetch(`${webserver.origin}/api/v1/status`);
 
       if (response.status !== 200) {
         throw Error();

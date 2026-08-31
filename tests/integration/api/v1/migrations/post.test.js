@@ -1,5 +1,6 @@
 import database from "infra/database";
 import orchestrator from "tests/orchestrator";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices(), await orchestrator.cleanDataBase();
@@ -9,7 +10,7 @@ beforeAll(async () => {
 describe("POST /api/v1/migrations", () => {
   describe("Anonymous User", () => {
     test("Run pending migrations without the create:migration feature", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/migrations", {
+      const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
         method: "POST",
       });
 
@@ -33,7 +34,7 @@ describe("POST /api/v1/migrations", () => {
         activatedUser.id,
       );
 
-      const response = await fetch("http://localhost:3000/api/v1/migrations", {
+      const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
         method: "POST",
         headers: {
           cookie: `session_id=${createdUserSession.token}`,
@@ -61,7 +62,7 @@ describe("POST /api/v1/migrations", () => {
         activatedUser.id,
       );
 
-      const response1 = await fetch("http://localhost:3000/api/v1/migrations", {
+      const response1 = await fetch(`${webserver.origin}/api/v1/migrations`, {
         method: "POST",
         headers: {
           cookie: `session_id=${createdUserSession.token}`,

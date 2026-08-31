@@ -2,6 +2,7 @@ import orchestrator from "tests/orchestrator";
 import { version as uuidVersion } from "uuid";
 import user from "model/user";
 import password from "model/password";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices(), await orchestrator.cleanDataBase();
@@ -18,7 +19,7 @@ describe("GET /api/v1/users", () => {
       await orchestrator.activateUser(createdUser);
 
       const responseFindUserByUsername = await fetch(
-        "http://localhost:3000/api/v1/users/username",
+        `${webserver.origin}/api/v1/users/username`,
       );
       const responseBody = await responseFindUserByUsername.json();
 
@@ -56,7 +57,7 @@ describe("GET /api/v1/users", () => {
       await orchestrator.activateUser(createdUser);
 
       const responseFindUserByUsername = await fetch(
-        `http://localhost:3000/api/v1/users/USERNAME1`,
+        `${webserver.origin}/api/v1/users/USERNAME1`,
       );
       const responseBody = await responseFindUserByUsername.json();
 
@@ -72,7 +73,7 @@ describe("GET /api/v1/users", () => {
 
     test("With nonexistent username", async () => {
       const responseFindUserByUsername = await fetch(
-        `http://localhost:3000/api/v1/users/UsuarioInexistente`,
+        `${webserver.origin}/api/v1/users/UsuarioInexistente`,
       );
       const responseBody = await responseFindUserByUsername.json();
 
