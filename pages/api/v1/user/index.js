@@ -4,15 +4,13 @@ import session from "model/session";
 import user from "model/user";
 import authorization from "model/authorization";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.get(controller.canRequest("read:session"), getHandler);
-
-export default router.handler({
-  onError: controller.errorHandlers.onErrorHandler,
-  onNoMatch: controller.errorHandlers.onNoMatcherHandler,
-});
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .get(controller.canRequest("read:session"), getHandler)
+  .handler({
+    onError: controller.errorHandlers.onErrorHandler,
+    onNoMatch: controller.errorHandlers.onNoMatcherHandler,
+  });
 
 async function getHandler(request, response) {
   const userTryingToGet = request.context.user;

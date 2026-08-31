@@ -3,15 +3,13 @@ import { createRouter } from "next-connect";
 import controller from "infra/controler";
 import authorization from "model/authorization";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.get(getHandler);
-
-export default router.handler({
-  onNoMatch: controller.errorHandlers.onNoMatcherHandler,
-  onError: controller.errorHandlers.onErrorHandler,
-});
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .get(getHandler)
+  .handler({
+    onNoMatch: controller.errorHandlers.onNoMatcherHandler,
+    onError: controller.errorHandlers.onErrorHandler,
+  });
 
 async function getHandler(request, response) {
   const updatedAt = new Date().toISOString();

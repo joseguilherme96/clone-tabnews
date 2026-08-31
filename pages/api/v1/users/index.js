@@ -4,14 +4,12 @@ import controller from "infra/controler";
 import activation from "model/activation.js";
 import authorization from "model/authorization";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.post(controller.canRequest("create:user"), postHandler);
-
-export default router.handler({
-  onError: controller.errorHandlers.onErrorHandler,
-});
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .post(controller.canRequest("create:user"), postHandler)
+  .handler({
+    onError: controller.errorHandlers.onErrorHandler,
+  });
 
 async function postHandler(request, response) {
   const inputCreateUser = request.body;
