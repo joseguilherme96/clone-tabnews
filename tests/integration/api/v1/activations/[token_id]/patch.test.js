@@ -197,7 +197,7 @@ describe("POST /api/v1/activations/[token_id]", () => {
       });
       orchestrator.tokenActivation(user1);
       await orchestrator.activateUser(user1);
-      const user1SessionObject = await orchestrator.createSession(user1.id);
+      const user1SessionObject = await orchestrator.createSession(user1);
 
       const user2 = await orchestrator.createUser();
       const activationTokenUser2 = await orchestrator.tokenActivation(user2);

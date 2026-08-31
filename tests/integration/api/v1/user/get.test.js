@@ -36,7 +36,7 @@ describe("GET /api/v1/user", () => {
 
       const activation = await orchestrator.activateUser(createdUser);
 
-      const createSession = await orchestrator.createSession(createdUser.id);
+      const createSession = await orchestrator.createSession(createdUser);
       const response = await fetch(`${webserver.origin}/api/v1/user`, {
         headers: {
           Cookie: `session_id=${createSession.token}`,
@@ -109,7 +109,7 @@ describe("GET /api/v1/user", () => {
 
       await orchestrator.activateUser(createdUser);
 
-      const createSession = await orchestrator.createSession(createdUser.id);
+      const createSession = await orchestrator.createSession(createdUser);
 
       jest.useRealTimers();
 
@@ -155,7 +155,7 @@ describe("GET /api/v1/user", () => {
 
       await orchestrator.activateUser(createdUser);
 
-      const createSession = await orchestrator.createSession(createdUser.id);
+      const createSession = await orchestrator.createSession(createdUser);
       jest.useRealTimers();
 
       const response = await fetch(`${webserver.origin}/api/v1/user`, {
@@ -180,7 +180,7 @@ describe("GET /api/v1/user", () => {
 
       await orchestrator.activateUser(createdUser);
 
-      const createSession = await orchestrator.createSession(createdUser.id);
+      const createSession = await orchestrator.createSession(createdUser);
       jest.useRealTimers();
 
       const response = await fetch(`${webserver.origin}/api/v1/user`, {
@@ -203,7 +203,7 @@ describe("GET /api/v1/user", () => {
         username: "SessionExpiresIn0.1Second",
       });
 
-      const createSession = await orchestrator.createSession(createdUser.id);
+      const createSession = await orchestrator.createSession(createdUser);
       jest.useRealTimers();
 
       const response = await fetch(`${webserver.origin}/api/v1/user`, {

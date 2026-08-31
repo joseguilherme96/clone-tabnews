@@ -29,10 +29,8 @@ describe("POST /api/v1/migrations", () => {
   describe("Default User", () => {
     test("Running pending migrations without the create:migration feature", async () => {
       const createdUser = await orchestrator.createUser();
-      const activatedUser = await orchestrator.activateUser(createdUser);
-      const createdUserSession = await orchestrator.createSession(
-        activatedUser.id,
-      );
+      await orchestrator.activateUser(createdUser);
+      const createdUserSession = await orchestrator.createSession(createdUser);
 
       const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
         method: "POST",
@@ -58,9 +56,8 @@ describe("POST /api/v1/migrations", () => {
       const createdUser = await orchestrator.createUser();
       const activatedUser = await orchestrator.activateUser(createdUser);
       await orchestrator.addFeaturesToUser(activatedUser, ["create:migration"]);
-      const createdUserSession = await orchestrator.createSession(
-        activatedUser.id,
-      );
+      const createdUserSession =
+        await orchestrator.createSession(activatedUser);
 
       const response1 = await fetch(`${webserver.origin}/api/v1/migrations`, {
         method: "POST",

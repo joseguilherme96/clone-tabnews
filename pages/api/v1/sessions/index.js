@@ -28,7 +28,7 @@ async function postHandler(request, response) {
     });
   }
 
-  const newSession = await session.create(authenticatedUser.id);
+  const newSession = await session.create(authenticatedUser);
 
   controller.setSessionCookie(response, newSession.token);
   controller.setCacheControl(response);

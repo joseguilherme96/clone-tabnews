@@ -131,7 +131,7 @@ describe("POST /api/v1/users", () => {
       const createdUser = await orchestrator.createUser();
       await orchestrator.tokenActivation(createdUser);
       await orchestrator.activateUser(createdUser);
-      const createdSession = await orchestrator.createSession(createdUser.id);
+      const createdSession = await orchestrator.createSession(createdUser);
 
       const response = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
