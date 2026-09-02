@@ -5,7 +5,8 @@ import user from "model/user";
 import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
-  await orchestrator.waitForAllServices(), await orchestrator.cleanDataBase();
+  await orchestrator.waitForAllServices();
+  await orchestrator.cleanDataBase();
   await orchestrator.runPendingMigrations();
 });
 
