@@ -305,7 +305,7 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
     createdSessionResponseBody = await createdSessionResponse.json();
 
     expect(createdSessionResponse.headers.get("set-cookie")).toBe(
-      `session_id=${createdSessionResponseBody.token}; Max-Age=2592000; Path=/; HttpOnly`,
+      `session_id=${createdSessionResponseBody.token}; Max-Age=2592000; Path=/; HttpOnly; SameSite=Lax`,
     );
     expect(createdSessionResponseBody.user_id).toBe(newUser.id);
   });

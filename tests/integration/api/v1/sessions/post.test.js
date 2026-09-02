@@ -149,7 +149,7 @@ describe("POST /api/v1/sessions", () => {
 
       const cookie = response.headers.get("set-cookie");
       expect(
-        `session_id=${responseBody.token}; Max-Age=${MAX_AGE}; Path=/; HttpOnly` ==
+        `session_id=${responseBody.token}; Max-Age=${MAX_AGE}; Path=/; HttpOnly; SameSite=Lax` ==
           cookie,
       ).toBe(true);
 
@@ -163,6 +163,7 @@ describe("POST /api/v1/sessions", () => {
         maxAge: MAX_AGE,
         path: "/",
         httpOnly: true,
+        sameSite: "Lax",
       });
     });
   });
