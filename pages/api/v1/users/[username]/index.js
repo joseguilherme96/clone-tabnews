@@ -4,15 +4,13 @@ import controller from "infra/controler";
 import authorization from "model/authorization";
 import { ForbiddenError } from "infra/errors";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.get(getHandler);
-router.patch(controller.canRequest("update:user"), patchHandler);
-
-export default router.handler({
-  onError: controller.errorHandlers.onErrorHandler,
-});
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .get(getHandler)
+  .patch(controller.canRequest("update:user"), patchHandler)
+  .handler({
+    onError: controller.errorHandlers.onErrorHandler,
+  });
 
 async function getHandler(request, response) {
   const userTryingToGet = request.context.user;

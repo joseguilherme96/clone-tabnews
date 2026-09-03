@@ -50,6 +50,7 @@ function setSessionCookie(response, sessionToken) {
     maxAge: session.EXPIRE_IN_MILISECONDS / 1000,
     secure: process.env.NODE_ENV == "production",
     httpOnly: true,
+    sameSite: "lax",
   });
   response.setHeader("Set-Cookie", setCookie);
 }

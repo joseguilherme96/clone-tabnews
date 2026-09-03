@@ -4,15 +4,13 @@ import activation from "model/activation";
 import user from "model/user";
 import authorization from "model/authorization";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.patch(controller.canRequest("read:activation_token"), patchHandler);
-
-export default router.handler({
-  onError: controller.errorHandlers.onErrorHandler,
-  onNoMatch: controller.errorHandlers.onNoMatcherHandler,
-});
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .patch(controller.canRequest("read:activation_token"), patchHandler)
+  .handler({
+    onError: controller.errorHandlers.onErrorHandler,
+    onNoMatch: controller.errorHandlers.onNoMatcherHandler,
+  });
 
 async function patchHandler(request, response) {
   const token = request.query.token_id;

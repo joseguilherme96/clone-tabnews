@@ -4,7 +4,7 @@ import { UnauthorizedError } from "infra/errors.js";
 
 const EXPIRE_IN_MILISECONDS = 60 * 60 * 24 * 30 * 1000; // Expire in 30 days
 
-async function create(userId) {
+async function create(user) {
   const token = crypto.randomBytes(48).toString("hex");
   const expiresAt = new Date(Date.now() + EXPIRE_IN_MILISECONDS);
 
@@ -23,7 +23,7 @@ async function create(userId) {
             * ;
         
         `,
-    values: [userId, token, expiresAt],
+    values: [user.id, token, expiresAt],
   });
 
   return results.rows[0];

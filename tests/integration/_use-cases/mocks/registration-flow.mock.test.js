@@ -113,7 +113,7 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
       );
     });
 
-    const response = await fetch("http://localhost:3000/api/v1/users", {
+    const response = await fetch(`${webserver.origin}/api/v1/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -262,7 +262,7 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
 
   test("Activate user", async () => {
     const activationResponse = await fetch(
-      `http://localhost:3000/api/v1/activations/${tokenActivation.id}`,
+      `${webserver.origin}/api/v1/activations/${tokenActivation.id}`,
       {
         method: "PATCH",
       },
@@ -287,7 +287,7 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
 
   test("Login", async () => {
     const createdSessionResponse = await fetch(
-      "http://localhost:3000/api/v1/sessions",
+      `${webserver.origin}/api/v1/sessions`,
       {
         method: "POST",
         headers: {
@@ -305,13 +305,13 @@ describe("Mock - Use case: Resgistration Flow (all sucessful)", () => {
     createdSessionResponseBody = await createdSessionResponse.json();
 
     expect(createdSessionResponse.headers.get("set-cookie")).toBe(
-      `session_id=${createdSessionResponseBody.token}; Max-Age=2592000; Path=/; HttpOnly`,
+      `session_id=${createdSessionResponseBody.token}; Max-Age=2592000; Path=/; HttpOnly; SameSite=Lax`,
     );
     expect(createdSessionResponseBody.user_id).toBe(newUser.id);
   });
 
   test("Get user information", async () => {
-    const response = await fetch("http://localhost:3000/api/v1/user", {
+    const response = await fetch(`${webserver.origin}/api/v1/user`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

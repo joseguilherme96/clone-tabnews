@@ -1,13 +1,16 @@
 import orchestrator from "tests/orchestrator.js";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
+  await orchestrator.cleanDataBase();
+  await orchestrator.runPendingMigrations();
 });
 
 describe("GET /api/v1/status", () => {
   describe("Anonymous User", () => {
     test("Retrieving current system status", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/status");
+      const response = await fetch(`${webserver.origin}/api/v1/status`);
       expect(response.status).toBe(200);
 
       const responseBody = await response.json();
@@ -26,11 +29,10 @@ describe("GET /api/v1/status", () => {
     test("User with valid session. Retrieving current system status.", async () => {
       const createdUser = await orchestrator.createUser();
       const activatedUser = await orchestrator.activateUser(createdUser);
-      const createdUserSession = await orchestrator.createSession(
-        activatedUser.id,
-      );
+      const createdUserSession =
+        await orchestrator.createSession(activatedUser);
 
-      const response = await fetch("http://localhost:3000/api/v1/status", {
+      const response = await fetch(`${webserver.origin}/api/v1/status`, {
         headers: {
           cookie: `session_id=${createdUserSession.token}`,
         },
@@ -54,11 +56,9 @@ describe("GET /api/v1/status", () => {
       const createdUser = await orchestrator.createUser();
       const activatedUser = await orchestrator.activateUser(createdUser);
       await orchestrator.addFeaturesToUser(activatedUser, ["read:status:all"]);
-      const createdUserSession = await orchestrator.createSession(
-        activatedUser.id,
-      );
+      const createdUserSession = await orchestrator.createSession(createdUser);
 
-      const response = await fetch("http://localhost:3000/api/v1/status", {
+      const response = await fetch(`${webserver.origin}/api/v1/status`, {
         headers: {
           cookie: `session_id=${createdUserSession.token}`,
         },

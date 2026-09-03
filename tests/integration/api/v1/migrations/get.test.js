@@ -1,14 +1,16 @@
 import orchestrator from "tests/orchestrator.js";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
-  await orchestrator.waitForAllServices(), await orchestrator.cleanDataBase();
+  await orchestrator.waitForAllServices();
+  await orchestrator.cleanDataBase();
   await orchestrator.runPendingMigrations();
 });
 
 describe("GET /api/v1/migrations", () => {
   describe("Anonymous User", () => {
     test("Running pending migrations", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/migrations");
+      const response = await fetch(`${webserver.origin}/api/v1/migrations`);
       expect(response.status).toBe(403);
 
       const responseBody = await response.json();
@@ -24,12 +26,10 @@ describe("GET /api/v1/migrations", () => {
   describe("Default User", () => {
     test("Running pending migrations", async () => {
       const createdUser = await orchestrator.createUser();
-      const activatedUser = await orchestrator.activateUser(createdUser);
-      const createdUserSession = await orchestrator.createSession(
-        activatedUser.id,
-      );
+      await orchestrator.activateUser(createdUser);
+      const createdUserSession = await orchestrator.createSession(createdUser);
 
-      const response = await fetch("http://localhost:3000/api/v1/migrations", {
+      const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
         headers: {
           cookie: `session_id=${createdUserSession.token}`,
         },
@@ -51,11 +51,9 @@ describe("GET /api/v1/migrations", () => {
       const createdUser = await orchestrator.createUser();
       const activatedUser = await orchestrator.activateUser(createdUser);
       await orchestrator.addFeaturesToUser(activatedUser, ["read:migration"]);
-      const createdUserSession = await orchestrator.createSession(
-        activatedUser.id,
-      );
+      const createdUserSession = await orchestrator.createSession(createdUser);
 
-      const response = await fetch("http://localhost:3000/api/v1/migrations", {
+      const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
         headers: {
           cookie: `session_id=${createdUserSession.token}`,
         },
