@@ -19,7 +19,7 @@ export default function DefaultLayout({
         <title>
           {metadados.title
             ? `${metadados.title} · Modern Systems`
-            : "Modern Systems"}{" "}
+            : "Modern Systems"}
         </title>
         {metadados.description && (
           <meta name="description" value={metadados.description} />
