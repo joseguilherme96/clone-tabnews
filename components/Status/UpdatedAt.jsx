@@ -1,6 +1,6 @@
-import Status from "./share/Status";
 import getText from "../../pages/status/utils/getText";
 import useSWRFecthAPIStatus from "pages/status/services/useSWRFecthAPIStatus";
+import { Banner } from "@primer/react";
 
 function UpdatedAt() {
   const [isLoading, data] = useSWRFecthAPIStatus();
@@ -8,9 +8,13 @@ function UpdatedAt() {
   let value = !isLoading
     ? new Date(data.updated_at).toLocaleString("pt-BR")
     : false;
-  let text = getText(isLoading, value);
+  let date_time = getText(isLoading, value);
 
-  return <Status descricao="Ultima atualização" value={text} />;
+  return (
+    <Banner layout="compact">
+      <Banner.Title>Ultima atualização {date_time}</Banner.Title>
+    </Banner>
+  );
 }
 
 export default UpdatedAt;

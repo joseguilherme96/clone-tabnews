@@ -1,6 +1,6 @@
-import StatusDataBaseMarginLeft from "./share/StatusDatabase";
 import getText from "../../../pages/status/utils/getText";
 import useSWRFecthAPIStatus from "pages/status/services/useSWRFecthAPIStatus";
+import { Card, Stack } from "@primer/react/experimental";
 
 function OpenedConnetions() {
   const [isLoading, data] = useSWRFecthAPIStatus();
@@ -9,10 +9,13 @@ function OpenedConnetions() {
   let text = getText(isLoading, value);
 
   return (
-    <StatusDataBaseMarginLeft
-      descricao="Opened Connetions"
-      value={text}
-    ></StatusDataBaseMarginLeft>
+    <Stack.Item grow>
+      <Card>
+        <Card.Heading>Conexões Abertas</Card.Heading>
+        <Card.Description>{text}</Card.Description>
+        <Card.Metadata>Uso neste instante</Card.Metadata>
+      </Card>
+    </Stack.Item>
   );
 }
 
