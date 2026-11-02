@@ -200,7 +200,7 @@ describe("GET /api/v1/user", () => {
         now: fakeCurrentDateTime.setMilliseconds(0),
       });
       const createdUser = await orchestrator.createUser({
-        username: "SessionExpiresIn0.1Second",
+        username: "SessionExpiresIn01Second",
       });
 
       const createSession = await orchestrator.createSession(createdUser);

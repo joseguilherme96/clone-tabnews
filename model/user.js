@@ -8,8 +8,15 @@ import {
 import password from "model/password";
 import activation from "model/activation.js";
 import authorization from "model/authorization.js";
+import PasswordVO from "domain/value_object/password.js";
+import EmailVO from "domain/value_object/email.js";
+import UsernameVO from "domain/value_object/username";
 
 async function create(inputCreateUser) {
+  new PasswordVO(inputCreateUser.password);
+  new EmailVO(inputCreateUser.email);
+  new UsernameVO(inputCreateUser.username);
+
   await validateUniqueUsername(inputCreateUser.username);
   await validateUniqueEmail(inputCreateUser.email);
   await hashPasswordInObject(inputCreateUser);

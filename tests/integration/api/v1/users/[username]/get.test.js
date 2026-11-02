@@ -38,7 +38,7 @@ describe("GET /api/v1/users", () => {
 
       const userInDataBase = await user.findOneByUsername("username");
       const correctPasswordMatch = await password.compare(
-        "sss",
+        "sss543433",
         userInDataBase.password,
       );
       const incorrectPasswordMatch = await password.compare(

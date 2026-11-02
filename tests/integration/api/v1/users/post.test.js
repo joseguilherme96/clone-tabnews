@@ -21,7 +21,7 @@ describe("POST /api/v1/users", () => {
         body: JSON.stringify({
           username: "joseguilherme96",
           email: "jose.guilherme96@outlook.com.br",
-          password: "sss",
+          password: "ssssd3432",
         }),
       });
 
@@ -42,7 +42,7 @@ describe("POST /api/v1/users", () => {
 
       const userInDataBase = await user.findOneByUsername("joseguilherme96");
       const correctPasswordMatch = await password.compare(
-        "sss",
+        "ssssd3432",
         userInDataBase.password,
       );
       const incorrectPasswordMatch = await password.compare(
@@ -67,7 +67,7 @@ describe("POST /api/v1/users", () => {
         body: JSON.stringify({
           username: "joseguilherme963",
           email: "duplicate@outlook.com.br",
-          password: "sss",
+          password: "ssssd343ss2",
         }),
       });
 
@@ -95,7 +95,7 @@ describe("POST /api/v1/users", () => {
         body: JSON.stringify({
           username: "Usernameduplicate",
           email: "usernameduplicate2@outlook.com.br",
-          password: "sss",
+          password: "ssssd3432",
         }),
       });
 
@@ -119,7 +119,7 @@ describe("POST /api/v1/users", () => {
         body: JSON.stringify({
           username: "UsuarioNaoLogado",
           email: "usuario.nao.logado@outlook.com.br",
-          password: "ssss44",
+          password: "ssss4434",
         }),
       });
 
@@ -143,7 +143,7 @@ describe("POST /api/v1/users", () => {
         body: JSON.stringify({
           username: "UsuarioLogado",
           email: "usuario.logado@outlook.com.br",
-          password: "sss",
+          password: "ssssd3432",
         }),
       });
 
