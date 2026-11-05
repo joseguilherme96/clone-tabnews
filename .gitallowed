@@ -2,3 +2,4 @@ password\s*=\s*\$4,
 const\s+password\s*=\s*\{
 inputCreateUser\.password\s*=\s*hashedPassword;?
 password == ""
+this.password = password

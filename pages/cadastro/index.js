@@ -4,7 +4,7 @@ import { useState } from "react";
 import PasswordVO from "domain/value_object/password.js";
 import EmailVO from "domain/value_object/email";
 import UsernameVO from "domain/value_object/username.js";
-import useValidator from "hooks/useValidator.js";
+import useStateValidator from "hooks/useStateValidator";
 
 export default function RegisterPage() {
   return (
@@ -24,42 +24,37 @@ export default function RegisterPage() {
 }
 
 function RegisterForm() {
-  const [
-    username,
-    setUsername,
-    usernameIsValid,
-    UsernameVOError,
-    showUsernameError,
-    setShowUsernameError,
-  ] = useValidator("", UsernameVO);
-  const [
-    password,
-    setPassword,
-    passwordIsValid,
-    PasswordVOError,
-    showPasswordError,
-    setShowPasswordError,
-  ] = useValidator("", PasswordVO);
+  const [username, setUsername, usernameHasError, UsernameVOError] =
+    useStateValidator("", UsernameVO);
+  const [password, setPassword, passwordHasError, PasswordVOError] =
+    useStateValidator("", PasswordVO);
 
-  const [
-    email,
-    setEmail,
-    emailIsValid,
-    EmailVOError,
-    showEmailError,
-    setShowEmailError,
-  ] = useValidator("", EmailVO);
+  const [email, setEmail, emailHasError, EmailVOError] = useStateValidator(
+    "",
+    EmailVO,
+  );
+
+  const border = {
+    border: "green solid 1px",
+    borderRadius: "0.3rem",
+  };
+
   const [isLoading, setLoading] = useState(false);
+
   const label = { display: "flex", alignItems: "center" };
+
+  const emailIsValid = !emailHasError && email;
+  const passwordIsValid = !passwordHasError && password;
+  const usernameIsValid = !usernameHasError && username;
 
   async function handleSubmit(event) {
     event.preventDefault();
 
-    email == "" && setShowEmailError(true);
-    password == "" && setShowPasswordError(true);
-    username == "" && setShowUsernameError(true);
+    email == "" && setEmail(email);
+    password == "" && setPassword(password);
+    username == "" && setUsername(username);
 
-    if (!passwordIsValid || !emailIsValid || !usernameIsValid) {
+    if (!emailIsValid || !passwordIsValid || !usernameIsValid) {
       return;
     }
 
@@ -78,6 +73,8 @@ function RegisterForm() {
     if (response.status === 201) {
       location.href = "/cadastro/confirmar";
     }
+
+    setLoading(false);
   }
 
   return (
@@ -95,19 +92,14 @@ function RegisterForm() {
               setUsername(event.target.value);
             }}
             block
-            style={{
-              border: usernameIsValid ? "green solid 1px" : "none",
-              borderRadius: "0.3rem",
-            }}
+            style={usernameIsValid ? border : {}}
           ></TextInput>
-          <ErrorMessage
-            data={{
-              isValid: usernameIsValid,
-              showError: showUsernameError,
-              message: UsernameVOError.message,
-              action: UsernameVOError.action,
-            }}
-          />
+
+          {usernameHasError && (
+            <FormControl.Validation variant="error">
+              {UsernameVOError?.message} {UsernameVOError?.action}
+            </FormControl.Validation>
+          )}
         </FormControl>
         <FormControl>
           <FormControl.Label style={label}>
@@ -121,19 +113,13 @@ function RegisterForm() {
               setEmail(event.target.value);
             }}
             block
-            style={{
-              border: emailIsValid ? "green solid 1px" : "none",
-              borderRadius: "0.3rem",
-            }}
+            style={emailIsValid ? border : {}}
           ></TextInput>
-          <ErrorMessage
-            data={{
-              isValid: emailIsValid,
-              showError: showEmailError,
-              message: EmailVOError.message,
-              action: EmailVOError.action,
-            }}
-          />
+          {emailHasError && (
+            <FormControl.Validation variant="error">
+              {EmailVOError?.message} {EmailVOError?.action}
+            </FormControl.Validation>
+          )}
         </FormControl>
         <FormControl>
           <FormControl.Label style={label}>
@@ -147,37 +133,19 @@ function RegisterForm() {
               setPassword(event.target.value);
             }}
             block
-            style={{
-              border: passwordIsValid ? "green solid 1px" : "none",
-              borderRadius: "0.3rem",
-            }}
+            style={passwordIsValid ? border : {}}
           ></TextInput>
-          <ErrorMessage
-            data={{
-              isValid: passwordIsValid,
-              showError: showPasswordError,
-              message: PasswordVOError.message,
-              action: PasswordVOError.action,
-            }}
-          />
+          {passwordHasError && (
+            <FormControl.Validation variant="error">
+              {PasswordVOError?.message} {PasswordVOError?.action}
+            </FormControl.Validation>
+          )}
         </FormControl>
         <Button type="submit" variant="primary" disabled={isLoading}>
           Cadastrar
         </Button>
       </Stack>
     </form>
-  );
-}
-
-function ErrorMessage({ data = {} }) {
-  return (
-    <>
-      {!data.isValid && data.showError && (
-        <FormControl.Validation variant="error">
-          {data.message} {data.action}
-        </FormControl.Validation>
-      )}
-    </>
   );
 }
 

@@ -1,35 +1,32 @@
 import { useState } from "react";
 import { ValidationError } from "infra/errors";
 
-export default function useStateValidator(valor, valueObject) {
-  const [valorForm, setValor] = useState("");
-  const [ehValido, setValido] = useState(false);
-  const [response, setResponse] = useState(
-    new ValidationError({
-      message: "O campo não pode ficar vazio.",
-      action: "Preencha o campo e tente novamente.",
-    }),
-  );
-  const [showError, setShowError] = useState(false);
+export default function useStateValidator(fieldValue, valueObject) {
+  const [value, setValue] = useState(fieldValue);
+  const [error, setError] = useState(null);
 
-  function validar(valor) {
+  function validate(fieldValue) {
     try {
-      new valueObject(valor);
-      setValido(true);
+      new valueObject(fieldValue);
+      setError(null);
+      return true;
     } catch (e) {
-      if (e instanceof ValidationError) {
-        setResponse({
-          message: e.message,
-          action: e.action,
+      if (!(e instanceof ValidationError)) {
+        setError({
+          message: "Ocorreu um erro interno desconhecido.",
+          action: "Por favor contate o suporte.",
         });
+        return false;
       }
 
-      setValido(false);
-      setShowError(true);
+      setError({
+        message: e.message,
+        action: e.action,
+      });
     } finally {
-      setValor(valor);
+      setValue(fieldValue);
     }
   }
 
-  return [valorForm, validar, ehValido, response, showError, setShowError];
+  return [value, validate, error !== null, error];
 }
