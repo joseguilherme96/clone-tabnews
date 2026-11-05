@@ -1,15 +1,16 @@
-import ColorTextDefault from "../../components/Color/ColorTextDefault";
 import UpdatedAt from "../../components/Status/UpdatedAt";
 import DataBase from "../../components/Status/DataBase/DataBase";
+import DefaultLayout from "Interface/DefaultLayout";
+import { Heading, Stack } from "@primer/react";
 
 export default function StatusPage() {
   return (
-    <>
-      <h1>
-        <ColorTextDefault descricao="Status" />
-      </h1>
-      <UpdatedAt />
-      <DataBase />
-    </>
+    <DefaultLayout contentWidth="medium" metadados={{ title: "Status" }}>
+      <Stack gap="spacious">
+        <Heading as="h1">Status</Heading>
+        <DataBase />
+        <UpdatedAt />
+      </Stack>
+    </DefaultLayout>
   );
 }

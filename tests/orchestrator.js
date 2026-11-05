@@ -56,11 +56,18 @@ async function runPendingMigrations() {
 
 async function createUser(userObject) {
   return await user.create({
-    username:
-      userObject?.username || faker.internet.username().replace("/[_.-]/g", ""),
+    username: userObject?.username || getUsernameMinLength(8, 30),
     email: userObject?.email || faker.internet.email(),
-    password: userObject?.password || "sss",
+    password: userObject?.password || "sss543433",
   });
+
+  function getUsernameMinLength(minLength = 8, maxLength = 30) {
+    let username = faker.internet.username().replace(/[_.-]/g, "");
+    while (username.length < minLength || username.length > maxLength) {
+      username = faker.internet.username().replace(/[_.-]/g, "");
+    }
+    return username;
+  }
 }
 
 async function createSession(user) {

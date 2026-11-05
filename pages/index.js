@@ -1,5 +1,15 @@
+import DefaultLayout from "Interface/DefaultLayout";
+
 function Home() {
-  return <h1>Impulsionando negócios através do código.</h1>;
+  return (
+    <DefaultLayout
+      metadados={{
+        description: "Softwares que geram valor para o seu negócio.",
+      }}
+    >
+      <h1>Softwares que geram valor para o seu negócio.</h1>
+    </DefaultLayout>
+  );
 }
 
 export default Home;
